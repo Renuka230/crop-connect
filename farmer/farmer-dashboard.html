@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Crop Connect - Farmer Dashboard</title>
+
+  <link rel="stylesheet" href="../css/farmer-dashboard.css">
+</head>
+
+<body>
+
+  <!-- ================= SIDEBAR ================= -->
+
+  <aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+      <span>🌱</span>
+      <span class="logo-text">Crop Connect</span>
+    </div>
+
+    <ul class="menu">
+
+      <li>
+        <a href="#" class="nav-item active" onclick="showPage('dashboard', this)">
+          <span>🏠</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#" class="nav-item" onclick="showPage('crops', this)">
+          <span>🌾</span>
+          <span class="nav-text">My Crops</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#" class="nav-item" onclick="showPage('orders', this)">
+          <span>📦</span>
+          <span class="nav-text">Orders</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#" class="nav-item" onclick="showPage('earnings', this)">
+          <span>💰</span>
+          <span class="nav-text">Earnings</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#" class="nav-item" onclick="showPage('profile', this)">
+          <span>👤</span>
+          <span class="nav-text">Profile</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#" class="nav-item" onclick="showPage('settings', this)">
+          <span>⚙️</span>
+          <span class="nav-text">Settings</span>
+        </a>
+      </li>
+
+    </ul>
+
+    <div class="logout">
+
+      <a href="#" onclick="logout()">
+        <span>🚪</span>
+        <span class="nav-text">Logout</span>
+      </a>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <main class="main">
+
+    <!-- ================= TOP BAR ================= -->
+
+    <header class="topbar">
+
+      <div class="mobile-menu" onclick="toggleSidebar()">
+        ☰
+      </div>
+
+      <div class="search">
+
+        🔍
+
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search..."
+          onkeyup="searchContent()"
+        >
+
+      </div>
+
+      <div class="profile">
+
+        <div class="notification" onclick="showNotification()">
+          🔔
+          <span class="notification-badge">3</span>
+        </div>
+
+        <div class="user-mini">
+          <div class="avatar">SP</div>
+
+          <div>
+            <strong>Suresh Patil</strong>
+            <small>Farmer</small>
+          </div>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- ===================================================== -->
+    <!-- ================= DASHBOARD PAGE ==================== -->
+    <!-- ===================================================== -->
+
+    <section class="content page active" id="dashboard">
+
+      <div class="page-heading">
+        <div>
+          <h1>Welcome back, Suresh! 🌱</h1>
+          <p>Here's what's happening with your farm today.</p>
+        </div>
+      </div>
+
+
+      <!-- ================= STATISTICS ================= -->
+
+      <div class="stats">
+
+        <div class="stat-card">
+
+          <div class="stat-icon green">
+            🌾
+          </div>
+
+          <div>
+            <h2 id="activeCropCount">4</h2>
+            <p>Active Crops</p>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-icon yellow">
+            💰
+          </div>
+
+          <div>
+            <h2>₹24,500</h2>
+            <p>This Month's Sales</p>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-icon blue">
+            📦
+          </div>
+
+          <div>
+            <h2>8</h2>
+            <p>Pending Orders</p>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-icon orange">
+            🌦️
+          </div>
+
+          <div>
+            <h2>28°C</h2>
+            <p>Today's Weather</p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= DASHBOARD GRID ================= -->
+
+      <div class="dashboard-grid">
+
+
+        <!-- ================= LEFT ================= -->
+
+        <div>
+
+          <!-- MY CROPS PREVIEW -->
+
+          <div class="card">
+
+            <div class="card-header">
+
+              <h3>🌾 My Crops</h3>
+
+              <button
+                class="add-btn"
+                onclick="showPage('crops', document.querySelectorAll('.nav-item')[1])"
+              >
+                View My Crops →
+              </button>
+
+            </div>
+
+
+            <div id="dashboardCropList">
+
+              <div class="crop">
+
+                <div class="crop-image">
+                  🌾
+                </div>
+
+                <div class="crop-info">
+                  <h4>Wheat</h4>
+                  <p>Expected harvest: 20 Oct</p>
+                </div>
+
+                <div class="progress-box">
+
+                  <div class="progress-label">
+                    <span>Growing</span>
+                    <span>65%</span>
+                  </div>
+
+                  <div class="progress">
+                    <div class="progress-bar" style="width:65%"></div>
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="crop">
+
+                <div class="crop-image">
+                  🌽
+                </div>
+
+                <div class="crop-info">
+                  <h4>Maize</h4>
+                  <p>Expected harvest: 5 Oct</p>
+                </div>
+
+                <div class="progress-box">
+
+                  <div class="progress-label">
+                    <span>Almost Ready</span>
+                    <span>90%</span>
+                  </div>
+
+                  <div class="progress">
+                    <div class="progress-bar" style="width:90%"></div>
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="crop">
+
+                <div class="crop-image">
+                  🥔
+                </div>
+
+                <div class="crop-info">
+                  <h4>Potato</h4>
+                  <p>Expected harvest: 15 Nov</p>
+                </div>
+
+                <div class="progress-box">
+
+                  <div class="progress-label">
+                    <span>Growing</span>
+                    <span>40%</span>
+                  </div>
+
+                  <div class="progress">
+                    <div class="progress-bar" style="width:40%"></div>
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="crop">
+
+                <div class="crop-image">
+                  🧅
+                </div>
+
+                <div class="crop-info">
+                  <h4>Onion</h4>
+                  <p>Expected harvest: 30 Nov</p>
+                </div>
+
+                <div class="progress-box">
+
+                  <div class="progress-label">
+                    <span>Early Stage</span>
+                    <span>25%</span>
+                  </div>
+
+                  <div class="progress">
+                    <div class="progress-bar" style="width:25%"></div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- MARKET PRICES INFORMATION -->
+
+          <div class="card">
+
+            <div class="card-header">
+
+              <h3>📈 Today's Market Prices</h3>
+
+            </div>
+
+
+            <div class="market-row market-header">
+
+              <span>Crop</span>
+              <span>Price / Quintal</span>
+              <span>Change</span>
+
+            </div>
+
+
+            <div class="market-row">
+
+              <span>🌾 Wheat</span>
+
+              <strong>₹2,450</strong>
+
+              <span class="up">
+                ↑ 4.2%
+              </span>
+
+            </div>
+
+
+            <div class="market-row">
+
+              <span>🌽 Maize</span>
+
+              <strong>₹2,100</strong>
+
+              <span class="up">
+                ↑ 2.1%
+              </span>
+
+            </div>
+
+
+            <div class="market-row">
+
+              <span>🥔 Potato</span>
+
+              <strong>₹1,800</strong>
+
+              <span class="down">
+                ↓ 1.4%
+              </span>
+
+            </div>
+
+
+            <div class="market-row">
+
+              <span>🧅 Onion</span>
+
+              <strong>₹2,300</strong>
+
+              <span class="up">
+                ↑ 5.8%
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= RIGHT ================= -->
+
+        <div>
+
+
+          <!-- WEATHER -->
+
+          <div class="card weather">
+
+            <div class="card-header">
+              <h3>🌦️ Weather</h3>
+            </div>
+
+            <div class="weather-icon">
+              ☀️
+            </div>
+
+            <div class="temperature">
+              28°C
+            </div>
+
+            <div class="weather-location">
+              📍 Pune, Maharashtra
+            </div>
+
+            <div class="weather-details">
+
+              <div class="weather-item">
+                💧 Humidity
+                <strong>62%</strong>
+              </div>
+
+              <div class="weather-item">
+                💨 Wind
+                <strong>12 km/h</strong>
+              </div>
+
+              <div class="weather-item">
+                🌡️ Feels Like
+                <strong>30°C</strong>
+              </div>
+
+              <div class="weather-item">
+                ☁️ Cloud
+                <strong>18%</strong>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- TODAY'S TASKS -->
+
+          <div class="card">
+
+            <div class="card-header">
+              <h3>📋 Today's Tasks</h3>
+            </div>
+
+
+            <div class="task">
+
+              <div
+                class="task-check"
+                onclick="completeTask(this)"
+              ></div>
+
+              <div class="task-text">
+                Apply fertilizer to Wheat
+
+                <div class="task-date">
+                  Today
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="task">
+
+              <div
+                class="task-check"
+                onclick="completeTask(this)"
+              ></div>
+
+              <div class="task-text">
+                Irrigate Maize
+
+                <div class="task-date">
+                  Today
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="task">
+
+              <div
+                class="task-check"
+                onclick="completeTask(this)"
+              ></div>
+
+              <div class="task-text">
+                Check Potato for pests
+
+                <div class="task-date">
+                  Tomorrow
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="task">
+
+              <div
+                class="task-check"
+                onclick="completeTask(this)"
+              ></div>
+
+              <div class="task-text">
+                Check market prices
+
+                <div class="task-date">
+                  Today
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- FARMING ALERT -->
+
+          <div class="card farming-alert">
+
+            <h3>⚠️ Farming Alert</h3>
+
+            <p>
+              Rain is expected tomorrow.
+              Consider delaying irrigation
+              and protect harvested crops.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- ================= MY CROPS PAGE ===================== -->
+    <!-- ===================================================== -->
+
+    <section class="content page" id="crops">
+
+      <div class="page-heading">
+
+        <div>
+          <h1>🌾 My Crops</h1>
+          <p>Manage all your crops from one place.</p>
+        </div>
+
+        <button class="primary-btn" onclick="openAddCropForm()">
+          + Add Crop
+        </button>
+
+      </div>
+
+
+      <!-- ADD CROP FORM -->
+
+      <div class="card add-crop-form" id="addCropForm">
+
+        <div class="card-header">
+          <h3>➕ Add New Crop</h3>
+
+          <button
+            class="close-btn"
+            onclick="closeAddCropForm()"
+          >
+            ✕
+          </button>
+        </div>
+
+
+        <form onsubmit="addCrop(event)">
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>Crop Name</label>
+
+              <select id="cropName" required>
+
+                <option value="">Select Crop</option>
+                <option value="🌾 Wheat">🌾 Wheat</option>
+                <option value="🌽 Maize">🌽 Maize</option>
+                <option value="🥔 Potato">🥔 Potato</option>
+                <option value="🧅 Onion">🧅 Onion</option>
+                <option value="🍅 Tomato">🍅 Tomato</option>
+                <option value="🌱 Other">🌱 Other</option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Quantity (kg)</label>
+
+              <input
+                type="number"
+                id="cropQuantity"
+                placeholder="Enter quantity"
+                min="1"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>Expected Harvest Date</label>
+
+              <input
+                type="date"
+                id="harvestDate"
+                required
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Growth Progress (%)</label>
+
+              <input
+                type="number"
+                id="cropProgress"
+                placeholder="Example: 50"
+                min="0"
+                max="100"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>Crop Status</label>
+
+            <select id="cropStatus" required>
+
+              <option value="Growing">
+                Growing
+              </option>
+
+              <option value="Almost Ready">
+                Almost Ready
+              </option>
+
+              <option value="Early Stage">
+                Early Stage
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-actions">
+
+            <button
+              type="button"
+              class="secondary-btn"
+              onclick="closeAddCropForm()"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="primary-btn"
+            >
+              Add Crop
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+
+      <!-- CROP LIST -->
+
+      <div class="card">
+
+        <div class="card-header">
+          <h3>My Crop List</h3>
+          <span id="cropTotal">4 Crops</span>
+        </div>
+
+        <div id="fullCropList">
+
+          <!-- CROPS ARE INSERTED BY JAVASCRIPT -->
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- ================= ORDERS PAGE ======================= -->
+    <!-- ===================================================== -->
+
+    <section class="content page" id="orders">
+
+      <div class="page-heading">
+
+        <div>
+          <h1>📦 My Orders</h1>
+          <p>Track your crop orders and sales.</p>
+        </div>
+
+      </div>
+
+
+      <div class="order-summary">
+
+        <div class="summary-card">
+          <span>📦</span>
+          <div>
+            <strong>8</strong>
+            <p>Pending</p>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <span>🚚</span>
+          <div>
+            <strong>3</strong>
+            <p>In Transit</p>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <span>✅</span>
+          <div>
+            <strong>24</strong>
+            <p>Delivered</p>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <span>💰</span>
+          <div>
+            <strong>₹82,400</strong>
+            <p>Total Sales</p>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-header">
+          <h3>Recent Orders</h3>
+        </div>
+
+
+        <div class="table-container">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Crop</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <tr>
+                <td>#CC1024</td>
+                <td>FreshMart</td>
+                <td>Wheat</td>
+                <td>2,000 kg</td>
+                <td>₹49,000</td>
+                <td><span class="status pending">Pending</span></td>
+              </tr>
+
+              <tr>
+                <td>#CC1021</td>
+                <td>Green Hotel</td>
+                <td>Maize</td>
+                <td>1,500 kg</td>
+                <td>₹31,500</td>
+                <td><span class="status processing">Processing</span></td>
+              </tr>
+
+              <tr>
+                <td>#CC1018</td>
+                <td>Agro Foods</td>
+                <td>Potato</td>
+                <td>1,000 kg</td>
+                <td>₹18,000</td>
+                <td><span class="status transit">In Transit</span></td>
+              </tr>
+
+              <tr>
+                <td>#CC1012</td>
+                <td>FreshMart</td>
+                <td>Onion</td>
+                <td>800 kg</td>
+                <td>₹18,400</td>
+                <td><span class="status delivered">Delivered</span></td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- ================= EARNINGS PAGE ===================== -->
+    <!-- ===================================================== -->
+
+    <section class="content page" id="earnings">
+
+      <div class="page-heading">
+
+        <div>
+          <h1>💰 Earnings</h1>
+          <p>Track your farm income and sales.</p>
+        </div>
+
+      </div>
+
+
+      <div class="earning-cards">
+
+        <div class="earning-card">
+
+          <span>💰</span>
+
+          <div>
+            <p>This Month</p>
+            <h2>₹24,500</h2>
+          </div>
+
+        </div>
+
+
+        <div class="earning-card">
+
+          <span>📈</span>
+
+          <div>
+            <p>Total Earnings</p>
+            <h2>₹1,84,500</h2>
+          </div>
+
+        </div>
+
+
+        <div class="earning-card">
+
+          <span>📦</span>
+
+          <div>
+            <p>Completed Sales</p>
+            <h2>24</h2>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-header">
+          <h3>Sales History</h3>
+        </div>
+
+
+        <div class="table-container">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Date</th>
+                <th>Crop</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <tr>
+                <td>05 Sep 2026</td>
+                <td>Wheat</td>
+                <td>2,000 kg</td>
+                <td>₹2,450/q</td>
+                <td>₹49,000</td>
+              </tr>
+
+              <tr>
+                <td>02 Sep 2026</td>
+                <td>Maize</td>
+                <td>1,500 kg</td>
+                <td>₹2,100/q</td>
+                <td>₹31,500</td>
+              </tr>
+
+              <tr>
+                <td>28 Aug 2026</td>
+                <td>Potato</td>
+                <td>1,000 kg</td>
+                <td>₹1,800/q</td>
+                <td>₹18,000</td>
+              </tr>
+
+              <tr>
+                <td>25 Aug 2026</td>
+                <td>Onion</td>
+                <td>800 kg</td>
+                <td>₹2,300/q</td>
+                <td>₹18,400</td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- ================= PROFILE PAGE ====================== -->
+    <!-- ===================================================== -->
+
+    <section class="content page" id="profile">
+
+      <div class="page-heading">
+
+        <div>
+          <h1>👤 My Profile</h1>
+          <p>Manage your farmer account information.</p>
+        </div>
+
+      </div>
+
+
+      <div class="profile-layout">
+
+
+        <div class="card profile-card">
+
+          <div class="profile-avatar-large">
+            SP
+          </div>
+
+          <h2>Suresh Patil</h2>
+
+          <p>Farmer</p>
+
+          <button
+            class="secondary-btn"
+            onclick="changePhoto()"
+          >
+            Change Photo
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="card-header">
+            <h3>Personal Information</h3>
+          </div>
+
+
+          <form onsubmit="saveProfile(event)">
+
+            <div class="form-row">
+
+              <div class="form-group">
+
+                <label>First Name</label>
+
+                <input
+                  type="text"
+                  id="firstName"
+                  value="Suresh"
+                  required
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>Last Name</label>
+
+                <input
+                  type="text"
+                  id="lastName"
+                  value="Patil"
+                  required
+                >
+
+              </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Email</label>
+
+              <input
+                type="email"
+                id="email"
+                value="suresh@example.com"
+                required
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Phone Number</label>
+
+              <input
+                type="tel"
+                id="phone"
+                value="+91 98765 43210"
+                required
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Farm Location</label>
+
+              <input
+                type="text"
+                id="location"
+                value="Pune, Maharashtra"
+                required
+              >
+
+            </div>
+
+
+            <button
+              type="submit"
+              class="primary-btn"
+            >
+              Save Changes
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- ================= SETTINGS PAGE ===================== -->
+    <!-- ===================================================== -->
+
+    <section class="content page" id="settings">
+
+      <div class="page-heading">
+
+        <div>
+          <h1>⚙️ Settings</h1>
+          <p>Manage your Crop Connect preferences.</p>
+        </div>
+
+      </div>
+
+
+      <div class="card settings-card">
+
+        <div class="card-header">
+          <h3>Notifications</h3>
+        </div>
+
+
+        <div class="setting-item">
+
+          <div>
+            <strong>Email Notifications</strong>
+            <p>Receive important updates by email.</p>
+          </div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              id="emailNotifications"
+              checked
+              onchange="saveSettings()"
+            >
+
+            <span class="slider"></span>
+
+          </label>
+
+        </div>
+
+
+        <div class="setting-item">
+
+          <div>
+            <strong>Crop Alerts</strong>
+            <p>Get alerts about your crops.</p>
+          </div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              id="cropAlerts"
+              checked
+              onchange="saveSettings()"
+            >
+
+            <span class="slider"></span>
+
+          </label>
+
+        </div>
+
+
+        <div class="setting-item">
+
+          <div>
+            <strong>Order Notifications</strong>
+            <p>Receive updates when your orders change.</p>
+          </div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              id="orderNotifications"
+              checked
+              onchange="saveSettings()"
+            >
+
+            <span class="slider"></span>
+
+          </label>
+
+        </div>
+
+
+        <div class="setting-item">
+
+          <div>
+            <strong>Weather Alerts</strong>
+            <p>Get important weather warnings.</p>
+          </div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              id="weatherAlerts"
+              checked
+              onchange="saveSettings()"
+            >
+
+            <span class="slider"></span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-header">
+          <h3>Account Preferences</h3>
+        </div>
+
+
+        <div class="setting-item">
+
+          <div>
+            <strong>Language</strong>
+            <p>Select your preferred language.</p>
+          </div>
+
+          <select class="small-select" onchange="saveSettings()">
+
+            <option>English</option>
+            <option>Marathi</option>
+
+          </select>
+
+        </div>
+
+
+        <div class="setting-item">
+
+          <div>
+            <strong>Dashboard Refresh</strong>
+            <p>Automatically refresh dashboard information.</p>
+          </div>
+
+          <select class="small-select" onchange="saveSettings()">
+
+            <option>Every 5 minutes</option>
+            <option>Every 10 minutes</option>
+            <option>Manual</option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script src="../js/farmer-dashboard.js"></script>
+
+</body>
+</html>

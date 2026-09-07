@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CropConnect - Customer Dashboard</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <!-- Customer CSS -->
+    <link rel="stylesheet" href="../css/customer-dashboard.css">
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+
+            <i class="fa-solid fa-seedling"></i>
+
+            <span>CropConnect</span>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a
+                    href="#"
+                    class="nav-item active"
+                    onclick="showPage('dashboard', this); return false;"
+                >
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a
+                    href="#"
+                    class="nav-item"
+                    onclick="showPage('product-detail', this); return false;"
+                >
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Product Detail</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a
+                    href="#"
+                    class="nav-item"
+                    onclick="showPage('cart', this); return false;"
+                >
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a
+                    href="#"
+                    class="nav-item"
+                    onclick="showPage('orders', this); return false;"
+                >
+                    <i class="fa-solid fa-truck-fast"></i>
+                    <span>My Orders</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a
+                    href="#"
+                    class="nav-item"
+                    onclick="showPage('profile', this); return false;"
+                >
+                    <i class="fa-solid fa-user"></i>
+                    <span>Customer Profile</span>
+                </a>
+            </li>
+
+        </ul>
+
+
+        <div class="logout">
+
+            <a href="#" onclick="logout(); return false;">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN WRAPPER
+    ====================================================== -->
+
+    <div class="main-wrapper">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header>
+
+            <div class="mobile-menu" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+
+
+            <div class="search-bar">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search fresh crops, vegetables..."
+                    onkeyup="searchProducts()"
+                >
+
+            </div>
+
+
+            <div class="header-user">
+
+                <div
+                    class="cart-icon-btn"
+                    onclick="showPage('cart', document.querySelectorAll('.nav-item')[2])"
+                >
+
+                    <i class="fa-solid fa-cart-shopping"></i>
+
+                    <span
+                        class="badge"
+                        id="cartBadge"
+                    >
+                        0
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="user-profile-preview"
+                    onclick="showPage('profile', document.querySelectorAll('.nav-item')[4])"
+                >
+
+                    <div class="avatar">
+                        JD
+                    </div>
+
+                    <div class="header-user-name">
+
+                        <strong id="headerName">
+                            John Doe
+                        </strong>
+
+                        <small>
+                            Customer
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             DASHBOARD PAGE
+        ================================================== -->
+
+        <main class="page active" id="dashboard">
+
+            <section class="content">
+
+
+                <!-- HERO -->
+
+                <div class="hero-banner">
+
+                    <div>
+
+                        <h1>
+                            Fresh Crops Direct From Local Farmers 🌱
+                        </h1>
+
+                        <p>
+                            Support local farmers and get fresh produce
+                            delivered straight to your door.
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-wheat-awn hero-icon"></i>
+
+                </div>
+
+
+
+                <!-- QUICK STATS -->
+
+                <div class="stats">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon green">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+
+                        <div>
+                            <h2 id="cartCount">0</h2>
+                            <p>Items in Cart</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon blue">
+                            <i class="fa-solid fa-box"></i>
+                        </div>
+
+                        <div>
+                            <h2>3</h2>
+                            <p>Active Orders</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon yellow">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+
+                        <div>
+                            <h2>5</h2>
+                            <p>Favorite Products</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon orange">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+
+                        <div>
+                            <h2>₹12,450</h2>
+                            <p>Total Purchases</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- MARKETPLACE -->
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h2>
+                            Fresh Marketplace
+                        </h2>
+
+                        <p>
+                            Fresh produce available from local farmers
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="outline-btn"
+                        onclick="showPage('product-detail', document.querySelectorAll('.nav-item')[1])"
+                    >
+                        View All
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="products-grid"
+                    id="productsGrid"
+                >
+
+
+                    <!-- PRODUCT 1 -->
+
+                    <div
+                        class="product-card"
+                        data-name="Organic Wheat"
+                    >
+
+                        <div class="product-image">
+                            <i class="fa-solid fa-wheat-awn"></i>
+                        </div>
+
+                        <div class="product-details">
+
+                            <div class="product-title">
+                                Organic Wheat
+                            </div>
+
+                            <div class="farmer-name">
+                                <i class="fa-solid fa-user"></i>
+                                Green Fields Farm
+                            </div>
+
+                            <div class="location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Pune
+                            </div>
+
+                            <div class="product-bottom">
+
+                                <span class="price">
+                                    ₹45 / kg
+                                </span>
+
+                                <button
+                                    class="add-cart-btn"
+                                    onclick="addToCart('Organic Wheat', 45)"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PRODUCT 2 -->
+
+                    <div
+                        class="product-card"
+                        data-name="Fresh Carrots"
+                    >
+
+                        <div class="product-image">
+                            <i class="fa-solid fa-carrot"></i>
+                        </div>
+
+                        <div class="product-details">
+
+                            <div class="product-title">
+                                Fresh Carrots
+                            </div>
+
+                            <div class="farmer-name">
+                                <i class="fa-solid fa-user"></i>
+                                Sunshine Agro
+                            </div>
+
+                            <div class="location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Nashik
+                            </div>
+
+                            <div class="product-bottom">
+
+                                <span class="price">
+                                    ₹35 / kg
+                                </span>
+
+                                <button
+                                    class="add-cart-btn"
+                                    onclick="addToCart('Fresh Carrots', 35)"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PRODUCT 3 -->
+
+                    <div
+                        class="product-card"
+                        data-name="Red Apples"
+                    >
+
+                        <div class="product-image">
+                            <i class="fa-solid fa-apple-whole"></i>
+                        </div>
+
+                        <div class="product-details">
+
+                            <div class="product-title">
+                                Red Apples
+                            </div>
+
+                            <div class="farmer-name">
+                                <i class="fa-solid fa-user"></i>
+                                Valley Orchards
+                            </div>
+
+                            <div class="location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Satara
+                            </div>
+
+                            <div class="product-bottom">
+
+                                <span class="price">
+                                    ₹120 / kg
+                                </span>
+
+                                <button
+                                    class="add-cart-btn"
+                                    onclick="addToCart('Red Apples', 120)"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PRODUCT 4 -->
+
+                    <div
+                        class="product-card"
+                        data-name="Fresh Lemons"
+                    >
+
+                        <div class="product-image">
+                            <i class="fa-solid fa-lemon"></i>
+                        </div>
+
+                        <div class="product-details">
+
+                            <div class="product-title">
+                                Fresh Lemons
+                            </div>
+
+                            <div class="farmer-name">
+                                <i class="fa-solid fa-user"></i>
+                                Citrus Farm
+                            </div>
+
+                            <div class="location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Baramati
+                            </div>
+
+                            <div class="product-bottom">
+
+                                <span class="price">
+                                    ₹60 / kg
+                                </span>
+
+                                <button
+                                    class="add-cart-btn"
+                                    onclick="addToCart('Fresh Lemons', 60)"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+
+        <!-- =================================================
+             PRODUCT DETAIL PAGE
+        ================================================== -->
+
+        <main class="page" id="product-detail">
+
+            <section class="content">
+
+                <div class="page-heading">
+
+                    <div>
+                        <h1>Product Details</h1>
+
+                        <p>
+                            Explore fresh crops directly from farmers.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="products-grid"
+                    id="allProductsGrid"
+                >
+
+                    <!-- Product cards generated by JS -->
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+
+        <!-- =================================================
+             CART PAGE
+        ================================================== -->
+
+        <main class="page" id="cart">
+
+            <section class="content">
+
+                <div class="page-heading">
+
+                    <div>
+                        <h1>🛒 My Cart</h1>
+
+                        <p>
+                            Review your selected crops before ordering.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="cart-layout">
+
+
+                    <div class="card">
+
+                        <div
+                            id="cartItems"
+                            class="cart-items"
+                        >
+
+                            <!-- Cart items generated by JS -->
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card order-summary">
+
+                        <h3>
+                            Order Summary
+                        </h3>
+
+                        <div class="summary-row">
+
+                            <span>
+                                Items
+                            </span>
+
+                            <strong id="summaryItems">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Subtotal
+                            </span>
+
+                            <strong id="cartSubtotal">
+                                ₹0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Delivery
+                            </span>
+
+                            <strong>
+                                ₹50
+                            </strong>
+
+                        </div>
+
+
+                        <hr>
+
+
+                        <div class="summary-total">
+
+                            <span>
+                                Total
+                            </span>
+
+                            <strong id="cartTotal">
+                                ₹50
+                            </strong>
+
+                        </div>
+
+
+                        <button
+                            class="checkout-btn"
+                            onclick="placeOrder()"
+                        >
+                            Proceed to Order
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+
+        <!-- =================================================
+             ORDERS PAGE
+        ================================================== -->
+
+        <main class="page" id="orders">
+
+            <section class="content">
+
+                <div class="page-heading">
+
+                    <div>
+
+                        <h1>🚚 My Orders</h1>
+
+                        <p>
+                            Track your recent purchases.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Order ID
+                                    </th>
+
+                                    <th>
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Farmer
+                                    </th>
+
+                                    <th>
+                                        Amount
+                                    </th>
+
+                                    <th>
+                                        Date
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="ordersTable">
+
+                                <tr>
+
+                                    <td>
+                                        #CC1001
+                                    </td>
+
+                                    <td>
+                                        Organic Wheat
+                                    </td>
+
+                                    <td>
+                                        Green Fields Farm
+                                    </td>
+
+                                    <td>
+                                        ₹2,250
+                                    </td>
+
+                                    <td>
+                                        05 Sep 2026
+                                    </td>
+
+                                    <td>
+                                        <span class="status delivered">
+                                            Delivered
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>
+                                        #CC1002
+                                    </td>
+
+                                    <td>
+                                        Fresh Carrots
+                                    </td>
+
+                                    <td>
+                                        Sunshine Agro
+                                    </td>
+
+                                    <td>
+                                        ₹1,750
+                                    </td>
+
+                                    <td>
+                                        03 Sep 2026
+                                    </td>
+
+                                    <td>
+                                        <span class="status transit">
+                                            In Transit
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>
+                                        #CC1003
+                                    </td>
+
+                                    <td>
+                                        Red Apples
+                                    </td>
+
+                                    <td>
+                                        Valley Orchards
+                                    </td>
+
+                                    <td>
+                                        ₹3,600
+                                    </td>
+
+                                    <td>
+                                        01 Sep 2026
+                                    </td>
+
+                                    <td>
+                                        <span class="status processing">
+                                            Processing
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+
+        <!-- =================================================
+             PROFILE PAGE
+        ================================================== -->
+
+        <main class="page" id="profile">
+
+            <section class="content">
+
+                <div class="page-heading">
+
+                    <div>
+
+                        <h1>👤 Customer Profile</h1>
+
+                        <p>
+                            Manage your personal information.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-layout">
+
+
+                    <div class="card profile-summary">
+
+                        <div class="profile-avatar-large">
+                            JD
+                        </div>
+
+                        <h2 id="profileDisplayName">
+                            John Doe
+                        </h2>
+
+                        <p>
+                            Customer
+                        </p>
+
+                        <button
+                            class="secondary-btn"
+                            onclick="showToast('Photo upload will be connected later.')"
+                        >
+                            Change Photo
+                        </button>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3 class="card-title">
+                            Personal Information
+                        </h3>
+
+
+                        <form onsubmit="saveProfile(event)">
+
+                            <div class="form-row">
+
+                                <div class="form-group">
+
+                                    <label>
+                                        First Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="firstName"
+                                        value="John"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label>
+                                        Last Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="lastName"
+                                        value="Doe"
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    value="john@example.com"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Phone Number
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    value="+91 98765 43210"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Delivery Address
+                                </label>
+
+                                <textarea
+                                    id="address"
+                                    rows="4"
+                                    required
+                                >Pune, Maharashtra</textarea>
+
+                            </div>
+
+
+                            <button
+                                type="submit"
+                                class="primary-btn"
+                            >
+                                Save Changes
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- JavaScript -->
+
+    <script src="../js/customer-dashboard.js"></script>
+
+</body>
+
+</html>
