@@ -1,0 +1,617 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop-Connect | From Farm to Home</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --green: #245b35;
+            --dark-green: #173f27;
+            --light-green: #eef5e9;
+            --orange: #edaa43;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #24352a;
+            background: #ffffff;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            padding: 15px 7%;
+            background: white;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--green);
+            font-size: 25px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .brand img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+
+        .nav-link {
+            color: #37483b;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+
+        .nav-link:hover {
+            color: #5d8c3c;
+        }
+
+        .btn-login {
+            border: 2px solid var(--green);
+            color: var(--green);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .btn-login:hover {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-register {
+            background: var(--green);
+            color: white;
+            padding: 12px 27px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .btn-register:hover {
+            background: var(--dark-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(120deg, #f2f7e9, #ffffff);
+            padding: 75px 7%;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            gap: 55px;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .tagline {
+            display: inline-block;
+            color: var(--green);
+            background: #e2efd9;
+            padding: 9px 17px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            font-size: clamp(38px, 4.5vw, 62px);
+            line-height: 1.15;
+            font-weight: 800;
+            color: var(--dark-green);
+            margin-bottom: 22px;
+        }
+
+        .hero h1 span {
+            color: #719c42;
+        }
+
+        .hero p {
+            color: #657367;
+            font-size: 17px;
+            line-height: 1.9;
+            max-width: 520px;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 32px;
+        }
+
+        .hero-image {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
+            border-radius: 28px;
+            box-shadow: 0 20px 45px rgba(36, 91, 53, 0.18);
+        }
+
+        .image-note {
+            position: absolute;
+            bottom: 22px;
+            left: 22px;
+            right: 22px;
+            background: rgba(255, 255, 255, 0.94);
+            padding: 17px 20px;
+            border-radius: 16px;
+            font-weight: 700;
+            color: var(--dark-green);
+        }
+
+        .image-note small {
+            display: block;
+            color: #738071;
+            font-weight: 400;
+            margin-top: 5px;
+        }
+
+        /* BENEFITS */
+        .benefits {
+            padding: 75px 7%;
+            text-align: center;
+        }
+
+        .section-label {
+            color: #719c42;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--dark-green);
+            margin: 12px 0;
+        }
+
+        .section-description {
+            color: #748075;
+            max-width: 650px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+
+        .benefit-card {
+            height: 100%;
+            padding: 30px 24px;
+            border: 1px solid #e8eee5;
+            border-radius: 20px;
+            background: white;
+            text-align: left;
+            transition: 0.3s;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 35px rgba(36, 91, 53, 0.09);
+        }
+
+        .benefit-icon {
+            width: 58px;
+            height: 58px;
+            background: var(--light-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            font-size: 28px;
+            margin-bottom: 22px;
+        }
+
+        .benefit-card h3 {
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--dark-green);
+        }
+
+        .benefit-card p {
+            color: #738071;
+            line-height: 1.8;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* HOW IT WORKS */
+        .how-it-works {
+            background: var(--light-green);
+            padding: 65px 7%;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 18px;
+            background: var(--green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .step h3 {
+            color: var(--dark-green);
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .step p {
+            color: #718071;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* CALL TO ACTION */
+        .cta {
+            margin: 70px 7%;
+            padding: 55px 25px;
+            background: var(--dark-green);
+            color: white;
+            text-align: center;
+            border-radius: 25px;
+        }
+
+        .cta h2 {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .cta p {
+            color: #d4e2d2;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .cta .btn-register {
+            background: var(--orange);
+            color: #24351f;
+        }
+
+        .cta .btn-register:hover {
+            background: #ffc15d;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 28px 7%;
+            background: #f6f8f3;
+            color: #738071;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        footer strong {
+            color: var(--green);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .hero-image img {
+                height: 330px;
+            }
+
+            .hero {
+                padding-top: 50px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 12px 5%;
+            }
+
+            .brand {
+                font-size: 20px;
+            }
+
+            .brand img {
+                width: 38px;
+                height: 38px;
+            }
+
+            .hero {
+                padding: 45px 6%;
+            }
+
+            .hero h1 {
+                font-size: 39px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .hero-image img {
+                height: 270px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .benefits,
+            .how-it-works {
+                padding: 55px 6%;
+            }
+
+            .cta h2 {
+                font-size: 27px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid p-0">
+
+            <a class="brand" href="home.html">
+                <img src="assets/logo/crop_connect_brand_logo.png"
+                     alt="Crop-Connect Logo">
+                Crop-Connect
+            </a>
+
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarMenu"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#benefits">Benefits</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item mt-2 mt-lg-0 ms-lg-3">
+                        <a class="btn-login" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item mt-3 mt-lg-0 ms-lg-3">
+                        <a class="btn-register" href="register.html">
+                            Register Now
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- HERO / ABOUT -->
+    <section class="hero" id="about">
+        <div class="hero-content">
+
+            <div class="hero-text">
+                <span class="tagline">
+                    🌱 A BETTER WAY TO BUY FRESH
+                </span>
+
+                <h1>
+                    From Farm<br>
+                    <span>Straight to You.</span>
+                </h1>
+
+                <p>
+                    Crop-Connect brings farmers and customers together
+                    on one simple platform. Discover fresh agricultural
+                    products, connect directly with farmers, and help
+                    build a fairer farming marketplace.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="register.html" class="btn-register">
+                        Get Started &nbsp; →
+                    </a>
+
+                    <a href="login.html" class="btn-login">
+                        Login to Account
+                    </a>
+                </div>
+
+                <div class="text-secondary small">
+                    🌾 Supporting Farmers &nbsp; • &nbsp;
+                    🥬 Connecting Customers
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <img src="assets/image/farmerimage.jpeg"
+                     alt="Farmer and agricultural field">
+
+                <div class="image-note">
+                    🌿 Connecting Farms to Families
+                    <small>Fresh produce. Direct connections. Better opportunities.</small>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="benefits" id="benefits">
+
+        <span class="section-label">WHY CROP-CONNECT?</span>
+
+        <h2 class="section-title">
+            Agriculture, Connected Better.
+        </h2>
+
+        <p class="section-description">
+            We aim to reduce the gap between farmers and customers
+            by making agricultural trade more direct, accessible,
+            and convenient.
+        </p>
+
+        <div class="row g-4 text-start">
+
+            <div class="col-md-6 col-lg-4">
+                <div class="benefit-card">
+                    <div class="benefit-icon">👨‍🌾</div>
+                    <h3>Direct Farmer Connection</h3>
+                    <p>
+                        Help farmers showcase their produce and connect
+                        with customers without relying entirely on
+                        multiple intermediaries.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🥬</div>
+                    <h3>Fresh Farm Products</h3>
+                    <p>
+                        Help customers discover agricultural products
+                        offered by farmers and explore available
+                        produce in one place.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🚚</div>
+                    <h3>Smarter Logistics</h3>
+                    <p>
+                        Support more organized order handling and
+                        delivery coordination between farmers
+                        and customers.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-it-works" id="how-it-works">
+
+        <span class="section-label">SIMPLE & CONVENIENT</span>
+
+        <h2 class="section-title mb-5">How Crop-Connect Works</h2>
+
+        <div class="row g-4">
+
+            <div class="col-md-4 step">
+                <div class="step-number">1</div>
+                <h3>Create an Account</h3>
+                <p>
+                    Register as a farmer or customer to get started.
+                </p>
+            </div>
+
+            <div class="col-md-4 step">
+                <div class="step-number">2</div>
+                <h3>Connect & Explore</h3>
+                <p>
+                    Farmers list their products, while customers
+                    explore available produce.
+                </p>
+            </div>
+
+            <div class="col-md-4 step">
+                <div class="step-number">3</div>
+                <h3>Buy & Sell Directly</h3>
+                <p>
+                    Connect through the marketplace and coordinate
+                    orders with greater convenience.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="cta">
+        <h2>Be Part of a Better Food Journey 🌱</h2>
+
+        <p>
+            Whether you grow crops or want to buy them,
+            your journey starts with Crop-Connect.
+        </p>
+
+        <a href="register.html" class="btn-register">
+            Join Crop-Connect Today &nbsp; →
+        </a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p class="mb-2">
+            <strong>Crop-Connect</strong> — From Farm to Home
+        </p>
+
+        <p class="mb-0">
+            Connecting Farmers. Empowering Customers.
+            <br>
+            © 2026 Crop-Connect. All rights reserved.
+        </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -1,219 +1,93 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Login | Crop-Connect</title>
 
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
-    <!-- Bootstrap Icons -->
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
-
-    <!-- Our CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="css/style.css">
-
 </head>
-
-
 <body class="login-page">
 
+    <a href="home.html" class="auth-home-link">
+        <i class="bi bi-arrow-left"></i> Back to Home
+    </a>
 
     <div class="login-container">
-
-
-        <!-- Left Side -->
-
         <div class="login-info">
-
-           <div class="brand-header">
-
-                <img 
-                    src="assets/logo/crop_connect_brand_logo.png" 
-                    alt="Crop-Connect Logo" 
-                    class="login-logo" 
-                >
-
-                <h1>
-                    Crop-Connect
-                </h1>
-
-           </div>
-
-            <h2>
-                From Farm to Market, Smarter.
-            </h2>
-
-            <p>
-                Connect directly with farmers and customers
-                through an AI-powered agricultural marketplace.
-            </p>
-
-
-            <div class="login-features">
-
-                <div>
-                    <i class="bi bi-check-circle-fill"></i>
-                    Direct Farmer-Consumer Connection
-                </div>
-
-                <div>
-                    <i class="bi bi-check-circle-fill"></i>
-                    AI-Powered Market Intelligence
-                </div>
-
-                <div>
-                    <i class="bi bi-check-circle-fill"></i>
-                    Smart Logistics
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Right Side -->
-
-        <div class="login-box">
-
-            <h2>
-                Welcome Back!
-            </h2>
-
-            <p class="login-subtitle">
-                Login to your Crop-Connect account
-            </p>
-
-
-            <!-- Role Selection -->
-
-            <label class="form-label">
-                Login As
-            </label>
-
-            <div class="role-buttons">
-
-                <button type="button" class="role-btn active">
-                    <i class="bi bi-person-fill"></i>
-                    Farmer
-                </button>
-
-                <button type="button" class="role-btn">
-                    <i class="bi bi-cart-fill"></i>
-                    Customer
-                </button>
-
-                <button type="button" class="role-btn">
-                    <i class="bi bi-shield-lock-fill"></i>
-                    Admin
-                </button>
-
-           </div>
-
-
-            <!-- Email -->
-
-            <div class="form-group">
-
-                <label class="form-label">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    class="form-control"
-                    placeholder="Enter your email"
-                >
-
-            </div>
-
-
-            <!-- Password -->
-
-            <div class="form-group">
-
-                <label class="form-label">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    class="form-control"
-                    placeholder="Enter your password"
-                >
-
-            </div>
-
-
-            <!-- Remember / Forgot -->
-
-            <div class="login-options">
-
-                <label>
-
-                    <input type="checkbox">
-
-                    Remember me
-
-                </label>
-
-                <a href="#">
-                    Forgot Password?
-                </a>
-
-            </div>
-
-
-            <!-- Login Button -->
-
-            <button class="main-login-btn">
-
-                Login
-
-                <i class="bi bi-arrow-right"></i>
-
-            </button>
-
-
-            <!-- Register -->
-
-            <p class="register-text">
-
-                Don't have an account?
-
-                <a href="register.html">
-                    Register Now
-                </a>
-
-            </p>
-
-
-            <!-- Back -->
-
-            <a href="index.html" class="back-home">
-
-                <i class="bi bi-arrow-left"></i>
-
-                Back to Home
-
+            <a href="home.html" class="brand-header">
+                <img src="assets/logo/crop_connect_brand_logo.png"
+                     alt="Crop-Connect Logo" class="login-logo">
+                <h1>Crop-Connect</h1>
             </a>
 
+            <h2>From Farm to Market, Smarter.</h2>
+            <p>
+                Connect directly with farmers and customers through
+                an agricultural marketplace designed to simplify trade.
+            </p>
+
+            <div class="login-features">
+                <div><i class="bi bi-check-circle-fill"></i> Direct Farmer-Consumer Connection</div>
+                <div><i class="bi bi-check-circle-fill"></i> Market Information</div>
+                <div><i class="bi bi-check-circle-fill"></i> Smart Logistics</div>
+            </div>
         </div>
 
+        <div class="login-box">
+            <h2>Welcome Back!</h2>
+            <p class="login-subtitle">Login to your Crop-Connect account</p>
+
+            <form id="loginForm">
+                <label class="form-label">Login As</label>
+
+                <div class="role-buttons">
+                    <button type="button" class="role-btn active" data-role="Farmer">
+                        <i class="bi bi-person-fill"></i> Farmer
+                    </button>
+                    <button type="button" class="role-btn" data-role="Customer">
+                        <i class="bi bi-cart-fill"></i> Customer
+                    </button>
+                    <button type="button" class="role-btn" data-role="Admin">
+                        <i class="bi bi-shield-lock-fill"></i> Admin
+                    </button>
+                </div>
+
+                <input type="hidden" id="loginRole" value="Farmer">
+
+                <div class="form-group">
+                    <label for="loginEmail" class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control"
+                           placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword" class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-control"
+                           placeholder="Enter your password" required minlength="6">
+                </div>
+
+                <div class="login-options">
+                    <label><input type="checkbox" id="rememberMe"> Remember me</label>
+                    <a href="#" id="forgotPassword">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="main-login-btn">
+                    Login <i class="bi bi-arrow-right"></i>
+                </button>
+            </form>
+
+            <p class="register-text">
+                Don't have an account?
+                <a href="register.html">Register Now</a>
+            </p>
+
+            <p id="loginMessage" class="form-message" aria-live="polite"></p>
+        </div>
     </div>
-<script src="js/script.js"></script>
 
+  <script type="module" src="js/login.js"></script>
 </body>
-
 </html>

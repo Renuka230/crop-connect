@@ -1,6 +1,13 @@
+
 /* =========================================================
    FARMER DASHBOARD JAVASCRIPT
    ========================================================= */
+
+import { auth } from "./firebase.js";
+
+import {
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
 
 /* =========================================================
@@ -8,55 +15,37 @@
    ========================================================= */
 
 function showPage(pageId, element) {
-
-  // Prevent # from appearing in URL
-  if (event) {
-    event.preventDefault();
+  if (window.event) {
+    window.event.preventDefault();
   }
 
-  // Hide all pages
-  const pages = document.querySelectorAll(".page");
-
-  pages.forEach(page => {
+  document.querySelectorAll(".page").forEach(page => {
     page.classList.remove("active");
   });
 
-
-  // Show selected page
   const selectedPage = document.getElementById(pageId);
 
   if (selectedPage) {
     selectedPage.classList.add("active");
   }
 
-
-  // Remove active class from sidebar
-  const navItems = document.querySelectorAll(".nav-item");
-
-  navItems.forEach(item => {
+  document.querySelectorAll(".nav-item").forEach(item => {
     item.classList.remove("active");
   });
 
-
-  // Add active class
   if (element) {
     element.classList.add("active");
   }
 
-
-  // Close mobile sidebar
   const sidebar = document.getElementById("sidebar");
 
   if (sidebar) {
     sidebar.classList.remove("mobile-open");
   }
 
-
-  // If My Crops page is opened, refresh crop list
   if (pageId === "crops") {
     renderCrops();
   }
-
 }
 
 
@@ -65,11 +54,11 @@ function showPage(pageId, element) {
    ========================================================= */
 
 function toggleSidebar() {
-
   const sidebar = document.getElementById("sidebar");
 
-  sidebar.classList.toggle("mobile-open");
-
+  if (sidebar) {
+    sidebar.classList.toggle("mobile-open");
+  }
 }
 
 
@@ -78,7 +67,6 @@ function toggleSidebar() {
    ========================================================= */
 
 let crops = [
-
   {
     id: 1,
     name: "🌾 Wheat",
@@ -87,7 +75,6 @@ let crops = [
     progress: 65,
     status: "Growing"
   },
-
   {
     id: 2,
     name: "🌽 Maize",
@@ -96,7 +83,6 @@ let crops = [
     progress: 90,
     status: "Almost Ready"
   },
-
   {
     id: 3,
     name: "🥔 Potato",
@@ -105,7 +91,6 @@ let crops = [
     progress: 40,
     status: "Growing"
   },
-
   {
     id: 4,
     name: "🧅 Onion",
@@ -114,44 +99,32 @@ let crops = [
     progress: 25,
     status: "Early Stage"
   }
-
 ];
 
 
 /* =========================================================
-   OPEN ADD CROP FORM
+   ADD CROP FORM
    ========================================================= */
 
 function openAddCropForm() {
-
   const form = document.getElementById("addCropForm");
 
   if (form) {
-
     form.classList.add("show");
 
     form.scrollIntoView({
       behavior: "smooth",
       block: "start"
     });
-
   }
-
 }
 
-
-/* =========================================================
-   CLOSE ADD CROP FORM
-   ========================================================= */
-
 function closeAddCropForm() {
-
   const form = document.getElementById("addCropForm");
 
   if (form) {
     form.classList.remove("show");
   }
-
 }
 
 
@@ -160,87 +133,48 @@ function closeAddCropForm() {
    ========================================================= */
 
 function addCrop(event) {
-
   event.preventDefault();
 
+  const cropName = document.getElementById("cropName").value;
+  const quantity = document.getElementById("cropQuantity").value;
+  const harvestDate = document.getElementById("harvestDate").value;
+  const progress = document.getElementById("cropProgress").value;
+  const status = document.getElementById("cropStatus").value;
 
-  const cropName =
-    document.getElementById("cropName").value;
-
-  const quantity =
-    document.getElementById("cropQuantity").value;
-
-  const harvestDate =
-    document.getElementById("harvestDate").value;
-
-  const progress =
-    document.getElementById("cropProgress").value;
-
-  const status =
-    document.getElementById("cropStatus").value;
-
-
-  if (!cropName || !quantity || !harvestDate || !progress) {
-
+  if (!cropName || !quantity || !harvestDate || progress === "") {
     showToast("Please fill all crop details.");
-
     return;
-
   }
 
+  const dateObject = new Date(harvestDate + "T12:00:00");
 
-  // Convert date to readable format
-  const dateObject = new Date(harvestDate);
+  const harvest = dateObject.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short"
+  });
 
-  const harvest = dateObject.toLocaleDateString(
-    "en-GB",
-    {
-      day: "numeric",
-      month: "short"
-    }
-  );
-
-
-  // Create new crop
   const newCrop = {
-
     id: Date.now(),
-
     name: cropName,
-
     quantity: Number(quantity),
-
     harvest: harvest,
-
     progress: Number(progress),
-
     status: status
-
   };
-
 
   crops.push(newCrop);
 
-
-  // Refresh list
   renderCrops();
-
-
-  // Update dashboard count
   updateCropCount();
 
+  const form = document.querySelector("#addCropForm form");
 
-  // Clear form
-  document.querySelector("#addCropForm form").reset();
+  if (form) {
+    form.reset();
+  }
 
-
-  // Hide form
   closeAddCropForm();
-
-
-  // Show message
   showToast("Crop added successfully! 🌱");
-
 }
 
 
@@ -249,21 +183,15 @@ function addCrop(event) {
    ========================================================= */
 
 function renderCrops() {
-
-  const cropList =
-    document.getElementById("fullCropList");
-
+  const cropList = document.getElementById("fullCropList");
 
   if (!cropList) {
     return;
   }
 
-
   cropList.innerHTML = "";
 
-
   if (crops.length === 0) {
-
     cropList.innerHTML = `
       <div class="empty-state">
         <h3>No crops added yet 🌱</h3>
@@ -271,59 +199,46 @@ function renderCrops() {
       </div>
     `;
 
+    updateCropCount();
     return;
-
   }
 
-
   crops.forEach(crop => {
-
     const cropElement = document.createElement("div");
 
     cropElement.className = "crop-list-item";
 
+    const spaceIndex = crop.name.indexOf(" ");
+
+    const emoji = spaceIndex === -1
+      ? ""
+      : crop.name.substring(0, spaceIndex);
+
+    const name = spaceIndex === -1
+      ? crop.name
+      : crop.name.substring(spaceIndex + 1);
 
     cropElement.innerHTML = `
-
-      <div class="crop-image">
-        ${crop.name.split(" ")[0]}
-      </div>
-
+      <div class="crop-image">${emoji}</div>
 
       <div class="crop-details">
-
-        <h4>
-          ${crop.name.substring(crop.name.indexOf(" ") + 1)}
-        </h4>
-
-        <p>
-          Quantity: ${crop.quantity.toLocaleString()} kg
-        </p>
-
-        <p>
-          Expected harvest: ${crop.harvest}
-        </p>
-
+        <h4>${name}</h4>
+        <p>Quantity: ${crop.quantity.toLocaleString()} kg</p>
+        <p>Expected harvest: ${crop.harvest}</p>
       </div>
 
-
       <div class="crop-progress">
-
         <div class="crop-progress-number">
           ${crop.status} - ${crop.progress}%
         </div>
 
         <div class="progress">
-
           <div
             class="progress-bar"
             style="width:${crop.progress}%"
           ></div>
-
         </div>
-
       </div>
-
 
       <button
         class="delete-crop"
@@ -331,25 +246,19 @@ function renderCrops() {
       >
         Delete
       </button>
-
     `;
 
-
     cropList.appendChild(cropElement);
-
   });
 
-
-  const total =
-    document.getElementById("cropTotal");
+  const total = document.getElementById("cropTotal");
 
   if (total) {
-
     total.textContent =
       `${crops.length} ${crops.length === 1 ? "Crop" : "Crops"}`;
-
   }
 
+  updateCropCount();
 }
 
 
@@ -358,37 +267,30 @@ function renderCrops() {
    ========================================================= */
 
 function deleteCrop(id) {
-
-  const crop = crops.find(c => c.id === id);
+  const crop = crops.find(item => item.id === id);
 
   if (!crop) {
     return;
   }
 
+  const spaceIndex = crop.name.indexOf(" ");
 
-  const cropName =
-    crop.name.substring(crop.name.indexOf(" ") + 1);
+  const cropName = spaceIndex === -1
+    ? crop.name
+    : crop.name.substring(spaceIndex + 1);
 
-
-  const confirmation =
-    confirm(`Are you sure you want to delete ${cropName}?`);
-
+  const confirmation = confirm(
+    `Are you sure you want to delete ${cropName}?`
+  );
 
   if (!confirmation) {
     return;
   }
 
-
-  crops =
-    crops.filter(crop => crop.id !== id);
-
+  crops = crops.filter(item => item.id !== id);
 
   renderCrops();
-
-  updateCropCount();
-
   showToast("Crop deleted successfully.");
-
 }
 
 
@@ -397,14 +299,11 @@ function deleteCrop(id) {
    ========================================================= */
 
 function updateCropCount() {
-
-  const count =
-    document.getElementById("activeCropCount");
+  const count = document.getElementById("activeCropCount");
 
   if (count) {
     count.textContent = crops.length;
   }
-
 }
 
 
@@ -413,65 +312,41 @@ function updateCropCount() {
    ========================================================= */
 
 function completeTask(element) {
-
   element.classList.toggle("completed");
 
-
-  const taskText =
-    element.nextElementSibling;
-
+  const taskText = element.nextElementSibling;
 
   if (taskText) {
     taskText.classList.toggle("completed");
   }
 
-
   if (element.classList.contains("completed")) {
-
     showToast("Task completed! ✓");
-
   }
-
 }
 
 
 /* =========================================================
-   NOTIFICATION
+   NOTIFICATIONS
    ========================================================= */
 
 function showNotification() {
-
-  const existing =
-    document.querySelector(".notification-message");
-
+  const existing = document.querySelector(".notification-message");
 
   if (existing) {
     existing.remove();
   }
 
+  const message = document.createElement("div");
 
-  const message =
-    document.createElement("div");
-
-
-  message.className =
-    "notification-message";
-
-
-  message.innerHTML = `
-    🔔 You have 3 new notifications.
-  `;
-
+  message.className = "notification-message";
+  message.textContent = "🔔 You have 3 new notifications.";
 
   document.body.appendChild(message);
 
-
   setTimeout(() => {
-
     message.remove();
-
   }, 3000);
-
 }
 
 
@@ -480,54 +355,37 @@ function showNotification() {
    ========================================================= */
 
 function saveProfile(event) {
-
   event.preventDefault();
 
-
-  const firstName =
-    document.getElementById("firstName").value;
-
-  const lastName =
-    document.getElementById("lastName").value;
-
+  const firstName = document.getElementById("firstName").value.trim();
+  const lastName = document.getElementById("lastName").value.trim();
 
   if (!firstName || !lastName) {
-
     showToast("Please enter your name.");
-
     return;
-
   }
 
+  const fullName = `${firstName} ${lastName}`;
 
-  // Update name in top bar
-  const userName =
-    document.querySelector(".user-mini strong");
-
+  const userName = document.querySelector(".user-mini strong");
 
   if (userName) {
-
-    userName.textContent =
-      `${firstName} ${lastName}`;
-
+    userName.textContent = fullName;
   }
 
-
-  // Update dashboard greeting
-  const heading =
-    document.querySelector("#dashboard h1");
-
+  const heading = document.querySelector("#dashboard h1");
 
   if (heading) {
-
-    heading.textContent =
-      `Welcome back, ${firstName}! 🌱`;
-
+    heading.textContent = `Welcome back, ${firstName}! 🌱`;
   }
 
+  const profileName = document.querySelector(".profile-card h2");
+
+  if (profileName) {
+    profileName.textContent = fullName;
+  }
 
   showToast("Profile updated successfully! ✓");
-
 }
 
 
@@ -536,11 +394,9 @@ function saveProfile(event) {
    ========================================================= */
 
 function changePhoto() {
-
   showToast(
     "Photo upload will be connected to your profile storage later."
   );
-
 }
 
 
@@ -549,9 +405,7 @@ function changePhoto() {
    ========================================================= */
 
 function saveSettings() {
-
   showToast("Settings saved successfully! ✓");
-
 }
 
 
@@ -560,84 +414,26 @@ function saveSettings() {
    ========================================================= */
 
 function searchContent() {
-
-  const searchInput =
-    document.getElementById("searchInput");
-
+  const searchInput = document.getElementById("searchInput");
 
   if (!searchInput) {
     return;
   }
 
+  const searchText = searchInput.value.toLowerCase().trim();
 
-  const searchText =
-    searchInput.value.toLowerCase().trim();
-
-
-  if (searchText === "") {
-    return;
-  }
-
-
-  const pages =
-    document.querySelectorAll(".page");
-
-
-  pages.forEach(page => {
-
-    const text =
-      page.innerText.toLowerCase();
-
-
-    if (text.includes(searchText)) {
-
-      page.style.outline =
-        "2px solid #2f7d45";
-
-    } else {
-
-      page.style.outline =
-        "none";
-
+  document.querySelectorAll(".page").forEach(page => {
+    if (!searchText) {
+      page.style.outline = "none";
+      return;
     }
 
+    const text = page.innerText.toLowerCase();
+
+    page.style.outline = text.includes(searchText)
+      ? "2px solid #2f7d45"
+      : "none";
   });
-
-}
-
-
-/* =========================================================
-   LOGOUT
-   ========================================================= */
-
-function logout() {
-
-  const confirmation =
-    confirm("Are you sure you want to logout?");
-
-
-  if (!confirmation) {
-    return;
-  }
-
-
-  showToast("Logging out...");
-
-
-  setTimeout(() => {
-
-    /*
-       Later you can replace this with:
-
-       window.location.href = "../login.html";
-
-       when your login page is ready.
-    */
-
-    window.location.href = "../index.html";
-
-  }, 1000);
-
 }
 
 
@@ -646,35 +442,68 @@ function logout() {
    ========================================================= */
 
 function showToast(message) {
-
-  const oldToast =
-    document.querySelector(".toast");
-
+  const oldToast = document.querySelector(".toast");
 
   if (oldToast) {
     oldToast.remove();
   }
 
-
-  const toast =
-    document.createElement("div");
-
+  const toast = document.createElement("div");
 
   toast.className = "toast";
-
   toast.textContent = message;
-
 
   document.body.appendChild(toast);
 
-
   setTimeout(() => {
-
     toast.remove();
-
   }, 2500);
-
 }
+
+
+/* =========================================================
+   FIREBASE LOGOUT
+   ========================================================= */
+
+async function logout() {
+  const confirmation = confirm("Are you sure you want to logout?");
+
+  if (!confirmation) {
+    return;
+  }
+
+  try {
+    await signOut(auth);
+
+    // Return to login page in the project root
+    window.location.replace("../login.html");
+  } catch (error) {
+    console.error("Logout error:", error);
+    alert("Unable to log out. Please try again.");
+  }
+}
+
+
+/* =========================================================
+   MAKE FUNCTIONS AVAILABLE TO HTML
+   ========================================================= */
+
+Object.assign(window, {
+  showPage,
+  toggleSidebar,
+  openAddCropForm,
+  closeAddCropForm,
+  addCrop,
+  deleteCrop,
+  completeTask,
+  showNotification,
+  saveProfile,
+  changePhoto,
+  saveSettings,
+  searchContent,
+  showToast,
+  logout
+});
 
 
 /* =========================================================
@@ -682,11 +511,6 @@ function showToast(message) {
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
-
-  // Display crops
   renderCrops();
-
-  // Update crop count
   updateCropCount();
-
 });
