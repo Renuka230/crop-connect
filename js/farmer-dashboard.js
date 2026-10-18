@@ -1,24 +1,31 @@
 
-/* =========================================================
-   FARMER DASHBOARD JAVASCRIPT
-   ========================================================= */
+/* =====================================================
+   CROP CONNECT - DYNAMIC FARMER DASHBOARD
+   ===================================================== */
 
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 
 import {
-  signOut
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  where,
+  serverTimestamp,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-/* =========================================================
-   PAGE NAVIGATION
-   ========================================================= */
+/* ---------------- PAGE NAVIGATION ---------------- */
 
 function showPage(pageId, element) {
-  if (window.event) {
-    window.event.preventDefault();
-  }
-
   document.querySelectorAll(".page").forEach(page => {
     page.classList.remove("active");
   });
@@ -37,159 +44,236 @@ function showPage(pageId, element) {
     element.classList.add("active");
   }
 
-  const sidebar = document.getElementById("sidebar");
-
-  if (sidebar) {
-    sidebar.classList.remove("mobile-open");
-  }
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
 
   if (pageId === "crops") {
     renderCrops();
   }
 }
 
-
-/* =========================================================
-   MOBILE SIDEBAR
-   ========================================================= */
-
 function toggleSidebar() {
-  const sidebar = document.getElementById("sidebar");
-
-  if (sidebar) {
-    sidebar.classList.toggle("mobile-open");
-  }
+  document.getElementById("sidebar")?.classList.toggle("mobile-open");
 }
 
+/* ---------------- CURRENT FARMER ---------------- */
 
-/* =========================================================
-   CROP DATA
-   ========================================================= */
+let currentFarmer = null;
+let crops = [];
+let stopCropsListener = null;
 
-let crops = [
-  {
-    id: 1,
-    name: "🌾 Wheat",
-    quantity: 3000,
-    harvest: "20 Oct",
-    progress: 65,
-    status: "Growing"
-  },
-  {
-    id: 2,
-    name: "🌽 Maize",
-    quantity: 2500,
-    harvest: "5 Oct",
-    progress: 90,
-    status: "Almost Ready"
-  },
-  {
-    id: 3,
-    name: "🥔 Potato",
-    quantity: 2200,
-    harvest: "15 Nov",
-    progress: 40,
-    status: "Growing"
-  },
-  {
-    id: 4,
-    name: "🧅 Onion",
-    quantity: 1800,
-    harvest: "30 Nov",
-    progress: 25,
-    status: "Early Stage"
-  }
-];
+function showToast(message) {
+  document.querySelector(".toast")?.remove();
 
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
 
-/* =========================================================
-   ADD CROP FORM
-   ========================================================= */
+  document.body.appendChild(toast);
 
-function openAddCropForm() {
-  const form = document.getElementById("addCropForm");
-
-  if (form) {
-    form.classList.add("show");
-
-    form.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  }
+  setTimeout(() => toast.remove(), 2500);
 }
 
-function closeAddCropForm() {
-  const form = document.getElementById("addCropForm");
-
-  if (form) {
-    form.classList.remove("show");
-  }
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
 }
 
+function formatHarvestDate(dateString) {
+  if (!dateString) return "Not set";
 
-/* =========================================================
-   ADD NEW CROP
-   ========================================================= */
+  const date = new Date(dateString + "T00:00:00");
 
-function addCrop(event) {
-  event.preventDefault();
+  if (Number.isNaN(date.getTime())) return "Not set";
 
-  const cropName = document.getElementById("cropName").value;
-  const quantity = document.getElementById("cropQuantity").value;
-  const harvestDate = document.getElementById("harvestDate").value;
-  const progress = document.getElementById("cropProgress").value;
-  const status = document.getElementById("cropStatus").value;
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
 
-  if (!cropName || !quantity || !harvestDate || progress === "") {
-    showToast("Please fill all crop details.");
+/* ---------------- AUTHENTICATION ---------------- */
+
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    if (stopCropsListener) stopCropsListener();
+
+    window.location.replace("../login.html");
     return;
   }
 
-  const dateObject = new Date(harvestDate + "T12:00:00");
+  currentFarmer = user;
 
-  const harvest = dateObject.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short"
-  });
+  await loadProfile(user);
+  loadFarmerCrops(user);
+});
 
-  const newCrop = {
-    id: Date.now(),
-    name: cropName,
-    quantity: Number(quantity),
-    harvest: harvest,
-    progress: Number(progress),
-    status: status
-  };
+/* ---------------- LOAD CROPS ---------------- */
 
-  crops.push(newCrop);
-
-  renderCrops();
-  updateCropCount();
-
-  const form = document.querySelector("#addCropForm form");
-
-  if (form) {
-    form.reset();
+function loadFarmerCrops(user) {
+  if (stopCropsListener) {
+    stopCropsListener();
   }
 
-  closeAddCropForm();
-  showToast("Crop added successfully! 🌱");
+  crops = [];
+
+  renderCrops();
+  renderDashboardPreview();
+  updateCropCount();
+
+  const cropsCollection = collection(db, "farmerCrops");
+
+  const farmerQuery = query(
+    cropsCollection,
+    where("farmerId", "==", user.uid)
+  );
+
+  stopCropsListener = onSnapshot(
+    farmerQuery,
+    snapshot => {
+      crops = snapshot.docs.map(item => ({
+        id: item.id,
+        ...item.data()
+      }));
+
+      renderCrops();
+      renderDashboardPreview();
+      updateCropCount();
+    },
+    error => {
+      console.error("Could not load crops:", error);
+      showToast("Could not load crops. Check Firebase permissions.");
+    }
+  );
 }
 
+/* ---------------- ADD-CROP FORM ---------------- */
 
-/* =========================================================
-   DISPLAY CROPS
-   ========================================================= */
+function openAddCropForm() {
+  const formContainer = document.getElementById("addCropForm");
+
+  if (!formContainer) {
+    showToast("Add-crop form not found.");
+    return;
+  }
+
+  formContainer.classList.add("show");
+
+  formContainer.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function closeAddCropForm() {
+  document.getElementById("addCropForm")?.classList.remove("show");
+}
+
+/* ---------------- ADD CROP ---------------- */
+
+async function addCrop() {
+  if (!currentFarmer) {
+    showToast("Please log in first.");
+    return;
+  }
+
+  const nameInput = document.getElementById("cropName");
+  const categoryInput = document.getElementById("cropCategory");
+  const quantityInput = document.getElementById("cropQuantity");
+  const priceInput = document.getElementById("cropPrice");
+  const dateInput = document.getElementById("harvestDate");
+  const progressInput = document.getElementById("cropProgress");
+  const statusInput = document.getElementById("cropStatus");
+
+  if (
+    !nameInput ||
+    !categoryInput ||
+    !quantityInput ||
+    !priceInput ||
+    !dateInput ||
+    !progressInput ||
+    !statusInput
+  ) {
+    showToast("Crop form fields are missing in the HTML.");
+    console.error("One or more crop input IDs were not found.");
+    return;
+  }
+
+  const name = nameInput.value.trim();
+  const category = categoryInput.value;
+  const quantity = Number(quantityInput.value);
+  const price = Number(priceInput.value);
+  const harvestDate = dateInput.value;
+  const progress = Number(progressInput.value);
+  const status = statusInput.value;
+
+  if (
+    !name ||
+    !category ||
+    !Number.isFinite(quantity) ||
+    quantity <= 0 ||
+    !Number.isFinite(price) ||
+    price <= 0 ||
+    !harvestDate ||
+    !Number.isFinite(progress) ||
+    progress < 0 ||
+    progress > 100 ||
+    !status
+  ) {
+    showToast("Please enter valid crop details.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "farmerCrops"), {
+      farmerId: currentFarmer.uid,
+      name,
+      category,
+      quantity,
+      price,
+      harvestDate,
+      progress,
+      status,
+      createdAt: serverTimestamp()
+    });
+
+    // Reset the actual HTML form, not its container.
+    const actualForm = document.querySelector("#addCropForm form");
+
+    if (actualForm) {
+      actualForm.reset();
+    } else {
+      // If #addCropForm itself is the form, reset it.
+      const formContainer = document.getElementById("addCropForm");
+
+      if (formContainer instanceof HTMLFormElement) {
+        formContainer.reset();
+      }
+    }
+
+    closeAddCropForm();
+    showToast("Crop saved successfully!");
+
+    // Firestore's onSnapshot listener refreshes the crop list.
+  } catch (error) {
+    console.error("Crop save failed:", error);
+    showToast("Crop could not be saved. Check Firebase rules.");
+  }
+}
+
+/* ---------------- DISPLAY ALL CROPS ---------------- */
 
 function renderCrops() {
   const cropList = document.getElementById("fullCropList");
 
-  if (!cropList) {
-    return;
-  }
+  if (!cropList) return;
 
-  cropList.innerHTML = "";
+  cropList.replaceChildren();
 
   if (crops.length === 0) {
     cropList.innerHTML = `
@@ -204,223 +288,299 @@ function renderCrops() {
   }
 
   crops.forEach(crop => {
-    const cropElement = document.createElement("div");
+    const item = document.createElement("div");
+    item.className = "crop-list-item";
 
-    cropElement.className = "crop-list-item";
-
-    const spaceIndex = crop.name.indexOf(" ");
-
-    const emoji = spaceIndex === -1
-      ? ""
-      : crop.name.substring(0, spaceIndex);
-
-    const name = spaceIndex === -1
-      ? crop.name
-      : crop.name.substring(spaceIndex + 1);
-
-    cropElement.innerHTML = `
-      <div class="crop-image">${emoji}</div>
+    item.innerHTML = `
+      <div class="crop-image">🌱</div>
 
       <div class="crop-details">
-        <h4>${name}</h4>
-        <p>Quantity: ${crop.quantity.toLocaleString()} kg</p>
-        <p>Expected harvest: ${crop.harvest}</p>
+        <h4>${escapeHtml(crop.name)}</h4>
+        <p>Quantity: ${escapeHtml(crop.quantity)} kg</p>
+        <p>
+          Expected harvest:
+          ${escapeHtml(formatHarvestDate(crop.harvestDate))}
+        </p>
       </div>
 
       <div class="crop-progress">
         <div class="crop-progress-number">
-          ${crop.status} - ${crop.progress}%
+          ${escapeHtml(crop.status)} - ${Number(crop.progress) || 0}%
         </div>
 
         <div class="progress">
           <div
             class="progress-bar"
-            style="width:${crop.progress}%"
-          ></div>
+            style="width:${Math.max(0, Math.min(100, Number(crop.progress) || 0))}%">
+          </div>
         </div>
       </div>
-
-      <button
-        class="delete-crop"
-        onclick="deleteCrop(${crop.id})"
-      >
-        Delete
-      </button>
     `;
 
-    cropList.appendChild(cropElement);
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-crop";
+    deleteButton.textContent = "Delete";
+
+    deleteButton.addEventListener("click", () => deleteCrop(crop.id));
+
+    item.appendChild(deleteButton);
+    cropList.appendChild(item);
   });
-
-  const total = document.getElementById("cropTotal");
-
-  if (total) {
-    total.textContent =
-      `${crops.length} ${crops.length === 1 ? "Crop" : "Crops"}`;
-  }
 
   updateCropCount();
 }
 
+/* ---------------- DELETE CROP ---------------- */
 
-/* =========================================================
-   DELETE CROP
-   ========================================================= */
+async function deleteCrop(id) {
+  if (!currentFarmer || !id) return;
 
-function deleteCrop(id) {
   const crop = crops.find(item => item.id === id);
 
-  if (!crop) {
+  if (!crop || crop.farmerId !== currentFarmer.uid) {
+    showToast("Crop not found in your account.");
     return;
   }
 
-  const spaceIndex = crop.name.indexOf(" ");
+  try {
+    await deleteDoc(doc(db, "farmerCrops", id));
 
-  const cropName = spaceIndex === -1
-    ? crop.name
-    : crop.name.substring(spaceIndex + 1);
-
-  const confirmation = confirm(
-    `Are you sure you want to delete ${cropName}?`
-  );
-
-  if (!confirmation) {
-    return;
+    showToast("Crop deleted successfully!");
+    // The listener updates the displayed list.
+  } catch (error) {
+    console.error("Crop deletion failed:", error);
+    showToast("Could not delete crop. Check Firebase rules.");
   }
-
-  crops = crops.filter(item => item.id !== id);
-
-  renderCrops();
-  showToast("Crop deleted successfully.");
 }
 
-
-/* =========================================================
-   UPDATE ACTIVE CROP COUNT
-   ========================================================= */
+/* ---------------- CROP COUNTS ---------------- */
 
 function updateCropCount() {
-  const count = document.getElementById("activeCropCount");
+  const count = crops.length;
 
-  if (count) {
-    count.textContent = crops.length;
+  const activeCount = document.getElementById("activeCropCount");
+  const totalCount = document.getElementById("cropTotal");
+
+  if (activeCount) {
+    activeCount.textContent = count;
+  }
+
+  if (totalCount) {
+    totalCount.textContent = `${count} ${count === 1 ? "Crop" : "Crops"}`;
   }
 }
 
+/* ---------------- DASHBOARD PREVIEW ---------------- */
 
-/* =========================================================
-   TASK COMPLETION
-   ========================================================= */
+function renderDashboardPreview() {
+  const container = document.getElementById("dashboardCropList");
 
-function completeTask(element) {
-  element.classList.toggle("completed");
+  if (!container) return;
 
-  const taskText = element.nextElementSibling;
+  container.replaceChildren();
 
-  if (taskText) {
-    taskText.classList.toggle("completed");
+  if (crops.length === 0) {
+    container.innerHTML = "<p>No crops added yet.</p>";
+    return;
   }
 
-  if (element.classList.contains("completed")) {
-    showToast("Task completed! ✓");
-  }
+  crops.slice(0, 4).forEach(crop => {
+    const item = document.createElement("div");
+    item.className = "crop";
+
+    item.innerHTML = `
+      <div class="crop-image">🌱</div>
+
+      <div class="crop-info">
+        <strong>${escapeHtml(crop.name)}</strong>
+        <p>Quantity: ${escapeHtml(crop.quantity)} kg</p>
+        <p>Harvest: ${escapeHtml(formatHarvestDate(crop.harvestDate))}</p>
+        <p>${escapeHtml(crop.status)}</p>
+
+        <div class="progress-box">
+          <div style="width:${Math.max(0, Math.min(100, Number(crop.progress) || 0))}%"></div>
+        </div>
+
+        <small>${Number(crop.progress) || 0}% complete</small>
+      </div>
+    `;
+
+    container.appendChild(item);
+  });
 }
 
+/* ---------------- PROFILE ---------------- */
 
-/* =========================================================
-   NOTIFICATIONS
-   ========================================================= */
+async function loadProfile(user) {
+  const firstNameInput = document.getElementById("firstName");
+  const lastNameInput = document.getElementById("lastName");
 
-function showNotification() {
-  const existing = document.querySelector(".notification-message");
+  let profile = {};
 
-  if (existing) {
-    existing.remove();
+  try {
+    const profileRef = doc(db, "users", user.uid);
+    const profileSnapshot = await getDoc(profileRef);
+
+    if (profileSnapshot.exists()) {
+      profile = profileSnapshot.data();
+    }
+  } catch (error) {
+    console.error("Could not load profile:", error);
   }
 
-  const message = document.createElement("div");
+  const authName = user.displayName || "";
+  const savedName = profile.name || authName;
+  const nameParts = savedName.trim().split(/\s+/).filter(Boolean);
 
-  message.className = "notification-message";
-  message.textContent = "🔔 You have 3 new notifications.";
+  const firstName = profile.firstName || nameParts[0] || "";
+  const lastName =
+    profile.lastName ||
+    nameParts.slice(1).join(" ") ||
+    "";
 
-  document.body.appendChild(message);
+  if (firstNameInput) firstNameInput.value = firstName;
+  if (lastNameInput) lastNameInput.value = lastName;
 
-  setTimeout(() => {
-    message.remove();
-  }, 3000);
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  const displayedName = fullName || user.email || "Farmer";
+
+  document.querySelectorAll(".user-mini strong").forEach(element => {
+    element.textContent = displayedName;
+  });
+
+  const heading = document.querySelector("#dashboard h1");
+
+  if (heading) {
+    heading.textContent = `Welcome back, ${firstName || "Farmer"}! 🌱`;
+  }
+
+  const profileHeading = document.querySelector(".profile-card h2");
+
+  if (profileHeading) {
+    profileHeading.textContent = displayedName;
+  }
+
+  document.querySelectorAll(
+    "#email, #profileEmail, [name='email']"
+  ).forEach(element => {
+    if ("value" in element) {
+      element.value = user.email || "";
+    }
+  });
 }
 
+async function saveProfile(event) {
+  event?.preventDefault();
 
-/* =========================================================
-   PROFILE
-   ========================================================= */
+  if (!currentFarmer) {
+    showToast("Please log in first.");
+    return;
+  }
 
-function saveProfile(event) {
-  event.preventDefault();
+  const firstName =
+    document.getElementById("firstName")?.value.trim() || "";
 
-  const firstName = document.getElementById("firstName").value.trim();
-  const lastName = document.getElementById("lastName").value.trim();
+  const lastName =
+    document.getElementById("lastName")?.value.trim() || "";
 
   if (!firstName || !lastName) {
-    showToast("Please enter your name.");
+    showToast("Please enter your first and last name.");
     return;
   }
 
   const fullName = `${firstName} ${lastName}`;
 
-  const userName = document.querySelector(".user-mini strong");
+  try {
+    await setDoc(
+      doc(db, "users", currentFarmer.uid),
+      {
+        firstName,
+        lastName,
+        name: fullName,
+        email: currentFarmer.email || "",
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
 
-  if (userName) {
-    userName.textContent = fullName;
+    await loadProfile(currentFarmer);
+
+    showToast("Profile saved successfully!");
+  } catch (error) {
+    console.error("Profile save failed:", error);
+    showToast("Could not save profile. Check Firebase rules.");
   }
-
-  const heading = document.querySelector("#dashboard h1");
-
-  if (heading) {
-    heading.textContent = `Welcome back, ${firstName}! 🌱`;
-  }
-
-  const profileName = document.querySelector(".profile-card h2");
-
-  if (profileName) {
-    profileName.textContent = fullName;
-  }
-
-  showToast("Profile updated successfully! ✓");
 }
 
-
-/* =========================================================
-   CHANGE PROFILE PHOTO
-   ========================================================= */
+/* ---------------- PROFILE PHOTO ---------------- */
 
 function changePhoto() {
-  showToast(
-    "Photo upload will be connected to your profile storage later."
-  );
+  const photoInput = document.getElementById("photoInput");
+
+  if (photoInput) {
+    photoInput.click();
+  }
 }
 
+function previewProfilePhoto(event) {
+  const file = event.target.files?.[0];
 
-/* =========================================================
-   SETTINGS
-   ========================================================= */
+  if (!file) return;
 
-function saveSettings() {
-  showToast("Settings saved successfully! ✓");
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-function searchContent() {
-  const searchInput = document.getElementById("searchInput");
-
-  if (!searchInput) {
+  if (!file.type.startsWith("image/")) {
+    showToast("Please select a valid image.");
+    event.target.value = "";
     return;
   }
 
-  const searchText = searchInput.value.toLowerCase().trim();
+  if (file.size > 5 * 1024 * 1024) {
+    showToast("Please select an image smaller than 5 MB.");
+    event.target.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const imageUrl = reader.result;
+
+    const avatarElements = [
+      document.getElementById("profileAvatar"),
+      document.querySelector(".user-mini .avatar")
+    ];
+
+    avatarElements.forEach(avatar => {
+      if (!avatar) return;
+
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = "Farmer profile photo";
+      image.style.width = "100%";
+      image.style.height = "100%";
+      image.style.objectFit = "cover";
+      image.style.borderRadius = "50%";
+
+      avatar.replaceChildren(image);
+    });
+
+    showToast("Profile photo selected successfully!");
+  };
+
+  reader.onerror = () => {
+    showToast("Could not open this image. Please try another.");
+  };
+
+  reader.readAsDataURL(file);
+}
+
+/* ---------------- SEARCH ---------------- */
+
+function searchContent() {
+  const input = document.getElementById("searchInput");
+
+  if (!input) return;
+
+  const searchText = input.value.toLowerCase().trim();
 
   document.querySelectorAll(".page").forEach(page => {
     if (!searchText) {
@@ -428,65 +588,31 @@ function searchContent() {
       return;
     }
 
-    const text = page.innerText.toLowerCase();
-
-    page.style.outline = text.includes(searchText)
-      ? "2px solid #2f7d45"
-      : "none";
+    page.style.outline =
+      page.innerText.toLowerCase().includes(searchText)
+        ? "2px solid #2f7d45"
+        : "none";
   });
 }
 
-
-/* =========================================================
-   TOAST MESSAGE
-   ========================================================= */
-
-function showToast(message) {
-  const oldToast = document.querySelector(".toast");
-
-  if (oldToast) {
-    oldToast.remove();
-  }
-
-  const toast = document.createElement("div");
-
-  toast.className = "toast";
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 2500);
-}
-
-
-/* =========================================================
-   FIREBASE LOGOUT
-   ========================================================= */
+/* ---------------- LOGOUT ---------------- */
 
 async function logout() {
-  const confirmation = confirm("Are you sure you want to logout?");
-
-  if (!confirmation) {
-    return;
-  }
+  if (!confirm("Are you sure you want to logout?")) return;
 
   try {
+    if (stopCropsListener) stopCropsListener();
+
     await signOut(auth);
 
-    // Return to login page in the project root
     window.location.replace("../login.html");
   } catch (error) {
-    console.error("Logout error:", error);
-    alert("Unable to log out. Please try again.");
+    console.error("Logout failed:", error);
+    showToast("Unable to log out. Please try again.");
   }
 }
 
-
-/* =========================================================
-   MAKE FUNCTIONS AVAILABLE TO HTML
-   ========================================================= */
+/* ---------------- HTML FUNCTION CONNECTIONS ---------------- */
 
 Object.assign(window, {
   showPage,
@@ -495,22 +621,15 @@ Object.assign(window, {
   closeAddCropForm,
   addCrop,
   deleteCrop,
-  completeTask,
-  showNotification,
   saveProfile,
   changePhoto,
-  saveSettings,
   searchContent,
   showToast,
   logout
 });
 
+/* ---------------- INITIAL COUNTS ---------------- */
 
-/* =========================================================
-   PAGE LOAD
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-  renderCrops();
-  updateCropCount();
-});
+renderCrops();
+renderDashboardPreview();
+updateCropCount();
