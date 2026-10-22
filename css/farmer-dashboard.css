@@ -1173,3 +1173,156 @@ th {
   }
 
 }
+
+/* ===== CROP CONNECT MARKET PRICES ===== */
+
+.market-card {
+  margin-top: 20px;
+  min-width: 0;
+}
+
+.market-description,
+.market-unit,
+.market-note {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.market-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+  margin: 20px 0 12px;
+}
+
+.market-filters .form-group {
+  min-width: 0;
+  margin: 0;
+}
+
+.market-filters label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+
+.market-filters select {
+  width: 100%;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #d5ddd5;
+  border-radius: 8px;
+  background: white;
+}
+
+#loadMarketPrices {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+#loadMarketPrices:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.market-status {
+  min-height: 22px;
+  color: #426346;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.market-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 8px;
+}
+
+.market-stat {
+  padding: 14px 10px;
+  background: #f0f7f0;
+  border-radius: 10px;
+  min-width: 0;
+}
+
+.market-stat span {
+  display: block;
+  font-size: 12px;
+  color: #58705a;
+  margin-bottom: 8px;
+}
+
+.market-stat strong {
+  display: block;
+  font-size: clamp(15px, 2vw, 22px);
+  color: #23652d;
+  overflow-wrap: anywhere;
+}
+
+.market-unit {
+  margin: 10px 0;
+}
+
+.market-chart-container {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  margin: 16px 0 24px;
+}
+
+.market-table-heading {
+  margin: 20px 0 12px;
+}
+
+.market-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.market-table th,
+.market-table td {
+  padding: 11px 10px;
+  border-bottom: 1px solid #e7ece7;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.market-table th {
+  background: #f0f7f0;
+  color: #315d35;
+}
+
+.market-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 600px) {
+  .market-filters {
+    grid-template-columns: 1fr;
+  }
+
+  #loadMarketPrices {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .market-summary {
+    gap: 6px;
+  }
+
+  .market-stat {
+    padding: 11px 7px;
+  }
+
+  .market-stat span {
+    font-size: 11px;
+  }
+
+  .market-chart-container {
+    height: 300px;
+  }
+}

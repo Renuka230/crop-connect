@@ -1,10 +1,13 @@
 <!DOCTYPE html>
+
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Crop Connect - Farmer Dashboard</title>
   <link rel="stylesheet" href="../css/farmer-dashboard.css">
+
 
   <style>
     .notification-wrapper {
@@ -94,384 +97,498 @@
       }
     }
   </style>
+
+
 </head>
+
 
 <body>
 
+
   <!-- SIDEBAR -->
+
+
   <aside class="sidebar" id="sidebar">
     <div class="logo">
       <span>🌱</span>
       <span class="logo-text">Crop Connect</span>
     </div>
 
-    <ul class="menu">
-      <li>
-        <a href="#" class="nav-item active"
+
+<ul class="menu">
+<li>
+<a href="#" class="nav-item active"
            onclick="showPage('dashboard', this); return false;">
-          <span>🏠</span><span class="nav-text">Dashboard</span>
-        </a>
-      </li>
+<span>🏠</span><span class="nav-text">Dashboard</span>
+</a>
+</li>
 
-      <li>
-        <a href="#" class="nav-item"
+<li>
+<a href="#" class="nav-item"
            onclick="showPage('crops', this); return false;">
-          <span>🌾</span><span class="nav-text">My Crops</span>
-        </a>
-      </li>
+<span>🌾</span><span class="nav-text">My Crops</span>
+</a>
+</li>
 
-      <li>
-        <a href="#" class="nav-item"
+<li>
+<a href="#" class="nav-item"
            onclick="showPage('orders', this); return false;">
-          <span>📦</span><span class="nav-text">Orders</span>
-        </a>
-      </li>
+<span>📦</span><span class="nav-text">Orders</span>
+</a>
+</li>
 
-      <li>
-        <a href="#" class="nav-item"
+<li>
+<a href="#" class="nav-item"
            onclick="showPage('profile', this); return false;">
-          <span>👤</span><span class="nav-text">Profile</span>
-        </a>
-      </li>
-    </ul>
+<span>👤</span><span class="nav-text">Profile</span>
+</a>
+</li>
+</ul>
 
-    <div class="logout">
-      <a href="#" onclick="logout(); return false;">
-        <span>🚪</span><span class="nav-text">Logout</span>
-      </a>
-    </div>
+<div class="logout">
+<a href="#" onclick="logout(); return false;">
+<span>🚪</span><span class="nav-text">Logout</span>
+</a>
+</div>
+
   </aside>
 
+
   <!-- MAIN CONTENT -->
+
+
   <main class="main">
 
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <div class="mobile-menu" onclick="toggleSidebar()">☰</div>
 
-      <div class="search">
-        🔍
-        <input type="text" id="searchInput"
+<!-- TOP BAR -->
+<header class="topbar">
+<div class="mobile-menu" onclick="toggleSidebar()">☰</div>
+
+<div class="search">
+🔍
+<input type="text" id="searchInput"
                placeholder="Search..."
                onkeyup="searchContent()">
-      </div>
+</div>
 
-      <!-- NOTIFICATION BELL -->
-      <div class="notification-wrapper">
-        <button type="button"
+<!-- NOTIFICATION BELL -->
+<div class="notification-wrapper">
+<button type="button"
                 id="notificationBell"
                 class="notification-bell"
                 onclick="toggleNotifications()"
                 aria-label="Open notifications"
                 aria-expanded="false">
-          🔔
-          <span id="notificationCount"
+🔔
+<span id="notificationCount"
                 class="notification-count"
                 hidden>0</span>
-        </button>
+</button>
 
-        <div id="notificationPanel"
+<div id="notificationPanel"
              class="notification-panel"
              hidden>
-          <h3>🔔 Notifications</h3>
-          <div id="notificationList">
-            <p class="empty-message">No new order notifications.</p>
-          </div>
-        </div>
-      </div>
+<h3>🔔 Notifications</h3>
+<div id="notificationList">
+<p class="empty-message">No new order notifications.</p>
+</div>
+</div>
+</div>
 
-      <div class="profile">
-        <div class="user-mini">
-          <div class="avatar">🌱</div>
-          <div>
-            <strong>Farmer</strong>
-            <small>Farmer</small>
-          </div>
-        </div>
-      </div>
-    </header>
+<div class="profile">
+<div class="user-mini">
+<div class="avatar">🌱</div>
+<div>
+<strong>Farmer</strong>
+<small>Farmer</small>
+</div>
+</div>
+</div>
+</header>
 
-    <!-- DASHBOARD -->
-    <section class="content page active" id="dashboard">
-      <div class="page-heading">
-        <div>
-          <h1>Welcome to Crop Connect! 🌱</h1>
-          <p>Manage your crops and track your orders.</p>
-        </div>
-      </div>
+<!-- DASHBOARD -->
+<section class="content page active" id="dashboard">
+<div class="page-heading">
+<div>
+<h1>Welcome to Crop Connect! 🌱</h1>
+<p>Manage your crops and track your orders.</p>
+</div>
+</div>
 
-      <div class="dashboard-grid">
-        <div>
+<div class="dashboard-grid">
+<div>
 
-          <!-- CROPS PREVIEW -->
-          <div class="card">
-            <div class="card-header">
-              <h3>🌾 My Crops</h3>
-              <button class="add-btn"
+<!-- CROPS PREVIEW -->
+<div class="card">
+<div class="card-header">
+<h3>🌾 My Crops</h3>
+<button class="add-btn"
                 onclick="showPage('crops', document.querySelectorAll('.nav-item')[1])">
-                View My Crops →
-              </button>
-            </div>
+View My Crops →
+</button>
+</div>
 
-            <div id="dashboardCropList">
-              <p class="empty-message">Loading your crops...</p>
-            </div>
-          </div>
+<div id="dashboardCropList">
+<p class="empty-message">Loading your crops...</p>
+</div>
+</div>
 
-          <!-- MARKET PRICES: NO FAKE DATA -->
-          <div class="card">
-            <div class="card-header">
-              <h3>📈 Market Prices</h3>
-            </div>
+<!-- MARKET PRICES -->
+<div class="card market-card">
+<div class="card-header">
+<h3>📈 Live Mandi Market Prices</h3>
+</div>
 
-            <p class="empty-message">
-              Live market prices are not connected yet.
-              Prices will appear here when a live market data source is connected.
-            </p>
-          </div>
+<p class="market-description">
+Check government-reported mandi prices for your selected vegetable and state.
+</p>
 
-        </div>
-      </div>
-    </section>
+<div class="market-filters">
+<div class="form-group">
+<label for="marketCommodity">Select Vegetable</label>
+<select id="marketCommodity">
+<option value="Tomato">Tomato</option>
+<option value="Onion">Onion</option>
+<option value="Potato">Potato</option>
+<option value="Cabbage">Cabbage</option>
+<option value="Brinjal">Brinjal</option>
+<option value="Cauliflower">Cauliflower</option>
+<option value="Carrot">Carrot</option>
+<option value="Green Chilli">Green Chilli</option>
+</select>
+</div>
 
-    <!-- MY CROPS -->
-    <section class="content page" id="crops">
-      <div class="page-heading">
-        <div>
-          <h1>🌾 My Crops</h1>
-          <p>Manage your crops in one place.</p>
-        </div>
+<div class="form-group">
+<label for="marketState">Select State</label>
+<select id="marketState">
+<option value="Maharashtra">Maharashtra</option>
+<option value="Keralam">Keralam</option>
+<option value="Andhra Pradesh">Andhra Pradesh</option>
+<option value="Karnataka">Karnataka</option>
+<option value="Gujarat">Gujarat</option>
+<option value="Madhya Pradesh">Madhya Pradesh</option>
+<option value="Rajasthan">Rajasthan</option>
+<option value="Tamil Nadu">Tamil Nadu</option>
+<option value="Uttar Pradesh">Uttar Pradesh</option>
+<option value="Punjab">Punjab</option>
+</select>
+</div>
 
-        <button class="primary-btn" onclick="openAddCropForm()">
-          + Add Crop
-        </button>
-      </div>
+<button type="button" class="primary-btn" id="loadMarketPrices">
+Show Prices
+</button>
+</div>
 
-      <!-- ADD CROP FORM -->
-      <div class="card add-crop-form" id="addCropForm">
-        <div class="card-header">
-          <h3>➕ Add New Crop</h3>
-          <button type="button" class="close-btn"
+<p id="marketStatus" class="market-status" role="status"
+               aria-live="polite">
+Select a vegetable and state to load market prices.
+</p>
+
+<div class="market-summary">
+<div class="market-stat">
+<span>Minimum Price</span>
+<strong id="marketMin">—</strong>
+</div>
+
+<div class="market-stat">
+<span>Modal Price</span>
+<strong id="marketModal">—</strong>
+</div>
+
+<div class="market-stat">
+<span>Maximum Price</span>
+<strong id="marketMax">—</strong>
+</div>
+</div>
+
+<p class="market-unit">Prices in ₹ per quintal</p>
+
+<div class="market-chart-container">
+<canvas id="marketPriceChart"
+                      role="img"
+                      aria-label="Bar graph showing mandi minimum, modal and maximum prices">
+</canvas>
+</div>
+
+<h4 class="market-table-heading">Available Mandi Records</h4>
+
+<div class="table-container">
+<table class="market-table">
+<thead>
+<tr>
+<th>Market</th>
+<th>District</th>
+<th>Min (₹/q)</th>
+<th>Modal (₹/q)</th>
+<th>Max (₹/q)</th>
+<th>Date</th>
+</tr>
+</thead>
+
+<tbody id="marketTableBody">
+<tr>
+<td colspan="6" class="empty-message">
+Market records will appear here.
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p class="market-note">
+Prices depend on available government records and may vary by market,
+variety and arrival date. This graph displays reported prices, not a
+guaranteed future-price prediction.
+</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- MY CROPS -->
+<section class="content page" id="crops">
+<div class="page-heading">
+<div>
+<h1>🌾 My Crops</h1>
+<p>Manage your crops in one place.</p>
+</div>
+
+<button class="primary-btn" onclick="openAddCropForm()">
++ Add Crop
+</button>
+</div>
+
+<!-- ADD CROP FORM -->
+<div class="card add-crop-form" id="addCropForm">
+<div class="card-header">
+<h3>➕ Add New Crop</h3>
+<button type="button" class="close-btn"
                   onclick="closeAddCropForm()">✕</button>
-        </div>
+</div>
 
-        <form onsubmit="event.preventDefault(); addCrop();">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cropName">Product Name</label>
-
-              <input
-                  type="text"
-                  id="cropName"
-                  name="cropName"
-                  placeholder="Enter product name (e.g. Mango, Rose, Tomato)"
-                  required
+<form onsubmit="event.preventDefault(); addCrop();">
+<div class="form-row">
+<div class="form-group">
+<label for="cropName">Product Name</label>
+<input
+                type="text"
+                id="cropName"
+                name="cropName"
+                placeholder="Enter product name (e.g. Mango, Rose, Tomato)"
+                required
               >
-            </div>
-              <div class="form-group">
-                <label for="cropCategory">Category</label>
-                <select id="cropCategory" name="cropCategory" required>
-                  <option value="">Select category</option>
-                  <option value="Vegetables">Vegetables</option>
-                  <option value="Fruits">Fruits</option>
-                  <option value="Flowers">Flowers</option>
-                  <option value="Grains">Grains</option>
-                </select>
-              </div>
+</div>
 
-            <div class="form-group">
-              <label for="cropQuantity">Quantity (kg)</label>
-              <input type="number" id="cropQuantity"
+<div class="form-group">
+<label for="cropCategory">Category</label>
+<select id="cropCategory" name="cropCategory" required>
+<option value="">Select category</option>
+<option value="Vegetables">Vegetables</option>
+<option value="Fruits">Fruits</option>
+<option value="Flowers">Flowers</option>
+<option value="Grains">Grains</option>
+</select>
+</div>
+
+<div class="form-group">
+<label for="cropQuantity">Quantity (kg)</label>
+<input type="number" id="cropQuantity"
                      placeholder="Enter quantity"
                      min="1" required>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="cropPrice">Price per kg (₹)</label>
-                <input
-                  type="number"
-                  id="cropPrice"
-                  name="cropPrice"
-                  placeholder="Enter price per kg"
-                  min="0.01"
-                  step="0.01"
-                  required
-                >
-              </div>
-            </div>
-          </div>
+</div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="harvestDate">Expected Harvest Date</label>
-              <input type="date" id="harvestDate" required>
-            </div>
+<div class="form-group">
+<label for="cropPrice">Price per kg (₹)</label>
+<input
+                type="number"
+                id="cropPrice"
+                name="cropPrice"
+                placeholder="Enter price per kg"
+                min="0.01"
+                step="0.01"
+                required
+              >
+</div>
+</div>
 
-            <div class="form-group">
-              <label for="cropProgress">Growth Progress (%)</label>
-              <input type="number" id="cropProgress"
+<div class="form-row">
+<div class="form-group">
+<label for="harvestDate">Expected Harvest Date</label>
+<input type="date" id="harvestDate" required>
+</div>
+
+<div class="form-group">
+<label for="cropProgress">Growth Progress (%)</label>
+<input type="number" id="cropProgress"
                      placeholder="Example: 50"
                      min="0" max="100" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="cropStatus">Crop Status</label>
-            <select id="cropStatus" required>
-              <option value="Growing">Growing</option>
-              <option value="Almost Ready">Almost Ready</option>
-              <option value="Early Stage">Early Stage</option>
-            </select>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="secondary-btn"
-                    onclick="closeAddCropForm()">Cancel</button>
-            <button type="submit" class="primary-btn">Add Crop</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- CROP LIST -->
-      <div class="card">
-        <div class="card-header">
-          <h3>My Crop List</h3>
-          <span id="cropTotal">0 Crops</span>
-        </div>
-
-        <div id="fullCropList">
-          <p class="empty-message">Loading your crops...</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ORDERS -->
-    <section class="content page" id="orders">
-      <div class="page-heading">
-        <div>
-          <h1>📦 My Orders</h1>
-          <p>Track orders placed by customers.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Recent Orders</h3>
-        </div>
-
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Crop</th>
-                <th>Quantity</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr>
-                <td colspan="6" class="empty-message">
-                  No orders yet.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROFILE -->
-    <section class="content page" id="profile">
-      <div class="page-heading">
-        <div>
-          <h1>👤 My Profile</h1>
-          <p>Manage your farmer account information.</p>
-        </div>
-      </div>
-
-      <div class="profile-layout">
-        <div class="card profile-card">
-  <div class="profile-avatar-large" id="profileAvatar">
-    🌱
-  </div>
-
-  <h2>Farmer</h2>
-  <p>Farmer</p>
-
-  <button
-    type="button"
-    class="secondary-btn"
-    onclick="changePhoto()">
-    Change Photo
-  </button>
-
-  <input
-    type="file"
-    id="photoInput"
-    accept="image/*"
-    hidden
-    onchange="previewProfilePhoto(event)">
 </div>
-          
-          
-          
-          
-            
-                
+</div>
 
-        <div class="card">
-          <div class="card-header">
-            <h3>Personal Information</h3>
-          </div>
+<div class="form-group">
+<label for="cropStatus">Crop Status</label>
+<select id="cropStatus" required>
+<option value="Growing">Growing</option>
+<option value="Almost Ready">Almost Ready</option>
+<option value="Early Stage">Early Stage</option>
+</select>
+</div>
 
-          <form onsubmit="saveProfile(event)">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="firstName">First Name</label>
-                <input type="text" id="firstName" required>
-              </div>
+<div class="form-actions">
+<button type="button" class="secondary-btn"
+                    onclick="closeAddCropForm()">Cancel</button>
+<button type="submit" class="primary-btn">Add Crop</button>
+</div>
+</form>
+</div>
 
-              <div class="form-group">
-                <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" required>
-              </div>
-            </div>
+<!-- CROP LIST -->
+<div class="card">
+<div class="card-header">
+<h3>My Crop List</h3>
+<span id="cropTotal">0 Crops</span>
+</div>
 
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" readonly>
-            </div>
+<div id="fullCropList">
+<p class="empty-message">Loading your crops...</p>
+</div>
+</div>
+</section>
 
-            <div class="form-group">
-              <label for="phone">Phone Number</label>
-              <input type="tel" id="phone"
+<!-- ORDERS: wrapped in a page section so sidebar navigation can show it -->
+<section class="content page" id="orders">
+<div class="page-heading">
+<div>
+<h1>📦 My Orders</h1>
+<p>Customer orders for your crops appear here automatically.</p>
+</div>
+</div>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Order ID</th>
+<th>Customer</th>
+<th>Crop</th>
+<th>Quantity</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="farmerOrdersBody">
+<tr>
+<td colspan="6" class="empty-message">
+Loading orders...
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- PROFILE -->
+<section class="content page" id="profile">
+<div class="page-heading">
+<div>
+<h1>👤 My Profile</h1>
+<p>Manage your farmer account information.</p>
+</div>
+</div>
+
+<div class="profile-layout">
+<div class="card profile-card">
+<div class="profile-avatar-large" id="profileAvatar">
+🌱
+</div>
+
+<h2>Farmer</h2>
+<p>Farmer</p>
+
+<button
+            type="button"
+            class="secondary-btn"
+            onclick="changePhoto()">
+Change Photo
+</button>
+
+<input
+            type="file"
+            id="photoInput"
+            accept="image/*"
+            hidden
+            onchange="previewProfilePhoto(event)">
+</div>
+
+<div class="card">
+<div class="card-header">
+<h3>Personal Information</h3>
+</div>
+
+<form onsubmit="saveProfile(event)">
+<div class="form-row">
+<div class="form-group">
+<label for="firstName">First Name</label>
+<input type="text" id="firstName" required>
+</div>
+
+<div class="form-group">
+<label for="lastName">Last Name</label>
+<input type="text" id="lastName" required>
+</div>
+</div>
+
+<div class="form-group">
+<label for="email">Email</label>
+<input type="email" id="email" readonly>
+</div>
+
+<div class="form-group">
+<label for="phone">Phone Number</label>
+<input type="tel" id="phone"
                      placeholder="Enter phone number">
-            </div>
+</div>
 
-            <div class="form-group">
-              <label for="location">Farm Location</label>
-              <input type="text" id="location"
+<div class="form-group">
+<label for="location">Farm Location</label>
+<input type="text" id="location"
                      placeholder="Enter farm location">
-            </div>
+</div>
 
-            <button type="submit" class="primary-btn">
-              Save Changes
-            </button>
-          </form>
-        </div>
-      </div>
-    </section>
+<button type="submit" class="primary-btn">
+Save Changes
+</button>
+</form>
+</div>
+</div>
+</section>
 
   </main>
 
+
   <!-- EXISTING DASHBOARD JAVASCRIPT -->
+
+
   <script type="module" src="../js/farmer-dashboard.js"></script>
 
+
+  <!-- Chart.js library for the bar graph -->
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <!-- Crop Connect Mandi prices -->
+
+
+  <script src="../js/market-prices.js"></script>
+
+
   <!-- FIREBASE ORDER NOTIFICATIONS -->
+
+
   <script type="module">
     import { auth, db } from "../js/firebase.js";
 
@@ -506,10 +623,6 @@
       }
     };
 
-    function escapeText(value) {
-      return String(value ?? "");
-    }
-
     function addNotification(order, orderId) {
       if (list.querySelector(".empty-message")) {
         list.replaceChildren();
@@ -518,15 +631,12 @@
       const item = document.createElement("div");
       item.className = "notification-item";
 
-      const customer =
-        order.customerName || order.customer || "A customer";
-
-      const crop =
-        order.cropName || order.crop || "your crop";
+      const customer = order.customerName || order.customer || "A customer";
+      const crop = order.cropName || order.crop || "your crop";
 
       item.textContent =
-        "🛒 " + escapeText(customer) +
-        " placed an order for " + escapeText(crop) + ".";
+        "🛒 " + String(customer) +
+        " placed an order for " + String(crop) + ".";
 
       item.dataset.orderId = orderId;
       list.prepend(item);
@@ -551,8 +661,6 @@
 
       if (!user) return;
 
-      // Expected Firestore structure:
-      // orders/{orderId} with a farmerId equal to user.uid.
       const ordersQuery = query(
         collection(db, "orders"),
         where("farmerId", "==", user.uid)
@@ -561,7 +669,7 @@
       stopListening = onSnapshot(
         ordersQuery,
         snapshot => {
-          // Do not notify for old orders already present at login.
+          // Skip existing orders when the farmer first signs in.
           if (initialSnapshot) {
             initialSnapshot = false;
             return;
@@ -581,6 +689,7 @@
       );
     });
   </script>
+
 
 </body>
 </html>

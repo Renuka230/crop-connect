@@ -4,12 +4,13 @@
 // ========================================
 // FIREBASE + CATEGORY DATA
 // ========================================
-
-import { db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 
 import {
     collection,
-    onSnapshot
+    onSnapshot,
+    addDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const categories = ["Vegetables", "Fruits", "Flowers", "Grains"];
@@ -389,6 +390,7 @@ function listenForFarmerProducts() {
 
                     return {
                         id: documentSnapshot.id,
+                        farmerId: crop.farmerId, // UID from your Firestore crop document
                         name: crop.name || "Unnamed crop",
                         category: crop.category || "",
                         price: Number(crop.price),
@@ -594,7 +596,7 @@ function renderCategoryProducts() {
         addButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
 
         addButton.addEventListener("click", () => {
-            addToCart(product.name, product.price);
+            addToCart(product);
         });
 
         const recipeButton = document.createElement("button");
@@ -820,17 +822,23 @@ function renderRecipeRecommendations(productName) {
 // ========================================
 // CART
 // ========================================
-
-function addToCart(name, price) {
+function addToCart(product) {
     const updatedCart = cart.map((item) => ({ ...item }));
-    const existingItem = updatedCart.find((item) => item.name === name);
+
+    // Identify a crop by its Firestore document ID.
+    // Different farmers can list crops with the same name.
+    const existingItem = updatedCart.find(
+        (item) => item.cropId === product.id
+    );
 
     if (existingItem) {
         existingItem.quantity++;
     } else {
         updatedCart.push({
-            name,
-            price: Number(price),
+            cropId: product.id,
+            farmerId: product.farmerId,
+            name: product.name,
+            price: Number(product.price),
             quantity: 1
         });
     }
@@ -839,12 +847,16 @@ function addToCart(name, price) {
 
     cart = updatedCart;
     updateCartBadge();
-    showToast(`${name} added to cart!`);
+    renderCart();
+    showToast(`${product.name} added to cart!`);
 }
 
-function changeQuantity(name, amount) {
+function changeQuantity(cropId, amount) {
     const updatedCart = cart.map((item) => ({ ...item }));
-    const item = updatedCart.find((product) => product.name === name);
+
+    const item = updatedCart.find(
+        (product) => product.cropId === cropId
+    );
 
     if (!item) return;
 
@@ -860,9 +872,10 @@ function changeQuantity(name, amount) {
     updateCartBadge();
     renderCart();
 }
-
-function removeFromCart(name) {
-    const updatedCart = cart.filter((item) => item.name !== name);
+function removeFromCart(cropId) {
+    const updatedCart = cart.filter(
+        (item) => item.cropId !== cropId
+    );
 
     if (!writeStorage(CART_KEY, updatedCart)) return;
 
@@ -918,7 +931,7 @@ function renderCart() {
             const minus = document.createElement("button");
             minus.type = "button";
             minus.textContent = "−";
-            minus.onclick = () => changeQuantity(item.name, -1);
+            minus.onclick = () => changeQuantity(item.cropId, -1);
 
             const quantity = document.createElement("span");
             quantity.textContent = item.quantity;
@@ -926,14 +939,13 @@ function renderCart() {
             const plus = document.createElement("button");
             plus.type = "button";
             plus.textContent = "+";
-            plus.onclick = () => changeQuantity(item.name, 1);
-
+            plus.onclick = () => changeQuantity(item.cropId, 1);
             const remove = document.createElement("button");
             remove.type = "button";
             remove.className = "remove-btn";
             remove.innerHTML = '<i class="fa-solid fa-trash"></i>';
             remove.setAttribute("aria-label", `Remove ${item.name}`);
-            remove.onclick = () => removeFromCart(item.name);
+            remove.onclick = () => removeFromCart(item.cropId);
 
             controls.append(minus, quantity, plus, remove);
             row.append(info, controls);
@@ -962,39 +974,117 @@ function renderCart() {
 // ========================================
 // PLACE ORDER (BROWSER-LOCAL)
 // ========================================
-
-function placeOrder() {
+async function placeOrder() {
     if (cart.length === 0) {
         showToast("Your cart is empty.");
         return;
     }
 
+    const customer = auth.currentUser;
+
+    if (!customer) {
+        showToast("Please log in before placing an order.");
+        return;
+    }
+
+    // Each cart item must have the crop ID and farmer UID.
+    if (cart.some((item) => !item.cropId || !item.farmerId)) {
+        showToast("A cart item is missing its farmer details. Remove it and add the crop again.");
+        return;
+    }
+
     const subtotal = cart.reduce(
-        (sum, item) => sum + item.price * item.quantity,
+        (sum, item) => sum + Number(item.price) * Number(item.quantity),
         0
     );
 
-    const newOrder = {
-        id: "CC" + Date.now().toString().slice(-8),
-        products: cart.map((item) => ({ ...item })),
-        amount: subtotal + DELIVERY_FEE,
-        date: new Date().toLocaleDateString("en-IN"),
-        status: "Processing"
-    };
+    // Group cart items by farmer. Each farmer receives only their own
+    // products in their own Firestore order document.
+    const itemsByFarmer = new Map();
 
-    const updatedOrders = [newOrder, ...orders];
+    cart.forEach((item) => {
+        if (!itemsByFarmer.has(item.farmerId)) {
+            itemsByFarmer.set(item.farmerId, []);
+        }
 
-    if (!writeStorage(ORDERS_KEY, updatedOrders)) return;
-    if (!writeStorage(CART_KEY, [])) return;
+        itemsByFarmer.get(item.farmerId).push({
+            cropId: item.cropId,
+            cropName: item.name,
+            quantity: Number(item.quantity),
+            unitPrice: Number(item.price),
+            itemTotal: Number(item.price) * Number(item.quantity)
+        });
+    });
 
-    orders = updatedOrders;
-    cart = [];
+    const farmerGroups = Array.from(itemsByFarmer.entries());
 
-    updateCartBadge();
-    renderCart();
-    renderOrders();
-    showToast("Order placed successfully!");
-    showPage("orders");
+    // Keep the existing ₹50 delivery fee once for the whole cart.
+    // For the demo, allocate it to the first farmer's order.
+    try {
+        for (let index = 0; index < farmerGroups.length; index++) {
+            const [farmerId, products] = farmerGroups[index];
+
+            const farmerSubtotal = products.reduce(
+                (sum, item) => sum + item.itemTotal,
+                0
+            );
+
+            const allocatedDeliveryFee = index === 0 ? DELIVERY_FEE : 0;
+
+            await addDoc(collection(db, "orders"), {
+                customerId: customer.uid,
+                customerName:
+                    `${profile.firstName || ""} ${profile.lastName || ""}`.trim()
+                    || customer.displayName
+                    || customer.email
+                    || "Customer",
+
+                farmerId,
+                products,
+
+                subtotal: farmerSubtotal,
+                deliveryFee: allocatedDeliveryFee,
+                amount: farmerSubtotal + allocatedDeliveryFee,
+
+                status: "Processing",
+                createdAt: serverTimestamp()
+            });
+        }
+
+        // Keep a local copy for the customer's existing My Orders display.
+        const newOrder = {
+            id: "CC" + Date.now().toString().slice(-8),
+            products: cart.map((item) => ({ ...item })),
+            amount: subtotal + DELIVERY_FEE,
+            date: new Date().toLocaleDateString("en-IN"),
+            status: "Processing"
+        };
+
+        const updatedOrders = [newOrder, ...orders];
+
+        if (!writeStorage(ORDERS_KEY, updatedOrders)) {
+            showToast("Order was saved online, but could not be saved in this browser.");
+            return;
+        }
+
+        if (!writeStorage(CART_KEY, [])) {
+            showToast("Order was saved online, but the cart could not be cleared.");
+            return;
+        }
+
+        orders = updatedOrders;
+        cart = [];
+
+        updateCartBadge();
+        renderCart();
+        renderOrders();
+        showToast("Order placed successfully!");
+        showPage("orders");
+
+    } catch (error) {
+        console.error("Firestore order creation failed:", error);
+        showToast("Could not place order. Check your connection and Firestore rules.");
+    }
 }
 
 function renderOrders() {

@@ -1,4 +1,3 @@
-
 /* =====================================================
    CROP CONNECT - DYNAMIC FARMER DASHBOARD
    ===================================================== */
@@ -60,6 +59,8 @@ function toggleSidebar() {
 let currentFarmer = null;
 let crops = [];
 let stopCropsListener = null;
+let farmerOrders = [];
+let stopOrdersListener = null;
 
 function showToast(message) {
   document.querySelector(".toast")?.remove();
@@ -102,6 +103,7 @@ function formatHarvestDate(dateString) {
 onAuthStateChanged(auth, async user => {
   if (!user) {
     if (stopCropsListener) stopCropsListener();
+    if (stopOrdersListener) stopOrdersListener();
 
     window.location.replace("../login.html");
     return;
@@ -111,6 +113,7 @@ onAuthStateChanged(auth, async user => {
 
   await loadProfile(user);
   loadFarmerCrops(user);
+  loadFarmerOrders(user);
 });
 
 /* ---------------- LOAD CROPS ---------------- */
@@ -151,7 +154,122 @@ function loadFarmerCrops(user) {
     }
   );
 }
+/* ---------------- LOAD FARMER ORDERS ---------------- */
 
+function loadFarmerOrders(user) {
+  // Stop the previous listener, if one exists.
+  if (stopOrdersListener) {
+    stopOrdersListener();
+  }
+
+  farmerOrders = [];
+  renderFarmerOrders();
+
+  const ordersQuery = query(
+    collection(db, "orders"),
+    where("farmerId", "==", user.uid)
+  );
+
+  stopOrdersListener = onSnapshot(
+    ordersQuery,
+    snapshot => {
+      farmerOrders = snapshot.docs.map(orderDoc => ({
+        id: orderDoc.id,
+        ...orderDoc.data()
+      }));
+
+      // Newest orders first, when a timestamp is available.
+      farmerOrders.sort((a, b) => {
+        const timeA = a.createdAt?.toMillis?.() || 0;
+        const timeB = b.createdAt?.toMillis?.() || 0;
+
+        return timeB - timeA;
+      });
+
+      renderFarmerOrders();
+    },
+    error => {
+      console.error("Could not load farmer orders:", error);
+
+      const tbody = document.getElementById("farmerOrdersBody");
+
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-message">
+              Could not load orders. Check Firebase permissions.
+            </td>
+          </tr>
+        `;
+      }
+    }
+  );
+}
+
+/* ---------------- DISPLAY FARMER ORDERS ---------------- */
+
+function renderFarmerOrders() {
+  const tbody = document.getElementById("farmerOrdersBody");
+
+  if (!tbody) return;
+
+  tbody.replaceChildren();
+
+  if (farmerOrders.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-message">
+          No orders received yet.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  farmerOrders.forEach(order => {
+    const products = Array.isArray(order.products)
+      ? order.products
+      : [];
+
+    // Show one table row for each product in this farmer's order.
+    if (products.length === 0) {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${escapeHtml(order.id)}</td>
+        <td>${escapeHtml(order.customerName || "Customer")}</td>
+        <td>Order details unavailable</td>
+        <td>—</td>
+        <td>₹${Number(order.amount || 0).toFixed(2)}</td>
+        <td>${escapeHtml(order.status || "Processing")}</td>
+      `;
+
+      tbody.appendChild(row);
+      return;
+    }
+
+    products.forEach(product => {
+      const row = document.createElement("tr");
+
+      const quantity = Number(product.quantity || 0);
+      const itemTotal = Number(
+        product.itemTotal ??
+        (quantity * Number(product.unitPrice || 0))
+      );
+
+      row.innerHTML = `
+        <td>${escapeHtml(order.id)}</td>
+        <td>${escapeHtml(order.customerName || "Customer")}</td>
+        <td>${escapeHtml(product.cropName || "Crop")}</td>
+        <td>${escapeHtml(quantity)} kg</td>
+        <td>₹${itemTotal.toFixed(2)}</td>
+        <td>${escapeHtml(order.status || "Processing")}</td>
+      `;
+
+      tbody.appendChild(row);
+    });
+  });
+}
 /* ---------------- ADD-CROP FORM ---------------- */
 
 function openAddCropForm() {
@@ -602,6 +720,7 @@ async function logout() {
 
   try {
     if (stopCropsListener) stopCropsListener();
+    if (stopOrdersListener) stopOrdersListener();
 
     await signOut(auth);
 
